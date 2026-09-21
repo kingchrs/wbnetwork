@@ -557,6 +557,19 @@
           </button>
         </div>
       </div>
+
+      <!-- Banner Download APK di Halaman Login -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--border);text-align:center">
+        <div style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">
+          📲 Unduh Aplikasi Android (APK)
+        </div>
+        <a href="https://www.mediafire.com/file/xsfmg2tx11xf57y/wbnetwork_1.0.zip/file" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #10b981, #059669);color:white;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:13px;padding:11px 16px;border-radius:12px;box-shadow:0 4px 12px rgba(16,185,129,0.28)">
+          📥 Download WB Network APK (.ZIP)
+        </a>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">
+          Install langsung di HP Android tanpa Google Play Store
+        </div>
+      </div>
     </div>
 
     <!-- ============================================== -->
@@ -623,17 +636,22 @@
           </button>
         </div>
 
-        <!-- Smart PWA Install Banner -->
-        <div id="pwaInstallBanner" class="card" style="background:linear-gradient(135deg, #1e293b, #0f172a);color:white;border:none;margin-bottom:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <img src="/icon.svg" style="width:42px;height:42px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.3);flex-shrink:0">
-            <div>
-              <div style="font-size:13px;font-weight:800;letter-spacing:-0.2px">Pasang Aplikasi di HP</div>
-              <div style="font-size:11px;color:#94a3b8">Akses tagihan & internet instan tanpa browser</div>
+        <!-- Smart PWA / APK Install Banner -->
+        <div id="pwaInstallBanner" class="card" style="background:linear-gradient(135deg, #1e293b, #0f172a);color:white;border:none;margin-bottom:14px;padding:16px;border-radius:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <img src="/icon.svg" style="width:40px;height:40px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.3);flex-shrink:0">
+              <div>
+                <div style="font-size:13.5px;font-weight:800;letter-spacing:-0.2px">Aplikasi Android WB Network</div>
+                <div style="font-size:11px;color:#94a3b8">Buka tagihan & Speedtest instan di HP</div>
+              </div>
             </div>
+            <a href="https://www.mediafire.com/file/xsfmg2tx11xf57y/wbnetwork_1.0.zip/file" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width:auto;padding:7px 12px;font-size:11.5px;font-weight:800;border-radius:10px;white-space:nowrap;text-decoration:none;display:inline-block">
+              📥 Unduh APK
+            </a>
           </div>
-          <button class="btn btn-primary" style="width:auto;padding:8px 14px;font-size:12px;font-weight:800;border-radius:10px;white-space:nowrap" onclick="triggerPwaInstall()">
-            📲 Pasang
+          <button class="btn btn-outline" style="font-size:11px;padding:5px 8px;color:#93c5fd;border-color:rgba(147,197,253,0.3);background:transparent" onclick="triggerPwaInstall()">
+            📲 Atau Pasang Pintasan Cepat (PWA)
           </button>
         </div>
 
@@ -786,9 +804,12 @@
             <div>⚡ <b>Paket:</b> <span id="profCustPlan">-</span></div>
           </div>
 
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-            <button class="btn btn-primary" style="margin-bottom:10px" onclick="triggerPwaInstall()">
-              📲 Pasang / Download Aplikasi di Layar HP
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
+            <a href="https://www.mediafire.com/file/xsfmg2tx11xf57y/wbnetwork_1.0.zip/file" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px">
+              📥 Unduh Aplikasi Android (MediaFire)
+            </a>
+            <button class="btn btn-outline" style="font-size:12px;padding:8px" onclick="triggerPwaInstall()">
+              📲 Pasang Pintasan di Layar HP (PWA)
             </button>
             <button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="handleLogout()">
               🚪 Keluar dari Akun Ini
@@ -812,32 +833,36 @@
       <div style="text-align:center;margin-bottom:16px">
         <img src="/icon.svg" style="width:60px;height:60px;border-radius:16px;box-shadow:0 6px 14px rgba(37,99,235,0.3)">
         <div style="font-size:15px;font-weight:800;color:#0f172a;margin-top:8px">WBnetwork Internet</div>
-        <div style="font-size:12px;color:var(--muted)">Aplikasi Ringan, Cepat & Tanpa Menghabiskan Memori</div>
+        <div style="font-size:12px;color:var(--muted)">Aplikasi Ringan, Cepat & Praktis</div>
       </div>
+
+      <!-- Tombol Download APK Langsung -->
+      <a href="https://www.mediafire.com/file/xsfmg2tx11xf57y/wbnetwork_1.0.zip/file" target="_blank" rel="noopener noreferrer" class="btn" style="background:linear-gradient(135deg,#10b981,#059669);color:white;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:13px;padding:11px;border-radius:12px;margin-bottom:14px">
+        📥 Unduh File APK Android (MediaFire)
+      </a>
 
       <!-- Panduan Android -->
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px">
-        <div style="font-size:12.5px;font-weight:800;color:#15803d;margin-bottom:4px">🤖 Untuk Pengguna Android (Google Chrome):</div>
+        <div style="font-size:12.5px;font-weight:800;color:#15803d;margin-bottom:4px">🤖 Cara Pasang Tanpa Install File (PWA):</div>
         <ol style="font-size:12px;color:#334155;padding-left:18px;line-height:1.6">
-          <li>Tekan tombol titik tiga <b>(⋮)</b> di pojok kanan atas Chrome.</li>
-          <li>Pilih menu <b>"Tambahkan ke Layar Utama (Install App)"</b>.</li>
-          <li>Klik <b>"Install"</b>. Aplikasi langsung muncul di menu HP Anda!</li>
+          <li>Tekan titik tiga <b>(⋮)</b> di pojok kanan atas Chrome.</li>
+          <li>Pilih <b>"Tambahkan ke Layar Utama (Install App)"</b>.</li>
+          <li>Selesai, ikon aplikasi langsung muncul di menu HP!</li>
         </ol>
       </div>
 
       <!-- Panduan iPhone -->
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:16px">
-        <div style="font-size:12.5px;font-weight:800;color:#0284c7;margin-bottom:4px">🍎 Untuk Pengguna iPhone / iPad (Safari):</div>
+        <div style="font-size:12.5px;font-weight:800;color:#0284c7;margin-bottom:4px">🍎 Untuk Pengguna iPhone (Safari):</div>
         <ol style="font-size:12px;color:#334155;padding-left:18px;line-height:1.6">
           <li>Buka web di browser <b>Safari</b>.</li>
-          <li>Tekan ikon <b>Bagikan (Share / Kotak Panah Atas 📤)</b> di bawah layar.</li>
-          <li>Gulir ke bawah dan pilih <b>"Tambah ke Layar Utama (Add to Home Screen) ➕"</b>.</li>
-          <li>Klik <b>"Tambah (Add)"</b> di kanan atas. Selesai!</li>
+          <li>Tekan ikon <b>Bagikan (Share 📤)</b> di bawah layar.</li>
+          <li>Pilih <b>"Tambah ke Layar Utama (Add to Home Screen) ➕"</b>.</li>
         </ol>
       </div>
 
-      <button class="btn btn-primary" onclick="closeInstallGuideModal()">
-        ✓ Saya Mengerti
+      <button class="btn btn-outline" onclick="closeInstallGuideModal()">
+        Tutup
       </button>
     </div>
   </div>
