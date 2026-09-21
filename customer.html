@@ -623,6 +623,20 @@
           </button>
         </div>
 
+        <!-- Smart PWA Install Banner -->
+        <div id="pwaInstallBanner" class="card" style="background:linear-gradient(135deg, #1e293b, #0f172a);color:white;border:none;margin-bottom:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img src="/icon.svg" style="width:42px;height:42px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.3);flex-shrink:0">
+            <div>
+              <div style="font-size:13px;font-weight:800;letter-spacing:-0.2px">Pasang Aplikasi di HP</div>
+              <div style="font-size:11px;color:#94a3b8">Akses tagihan & internet instan tanpa browser</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:auto;padding:8px 14px;font-size:12px;font-weight:800;border-radius:10px;white-space:nowrap" onclick="triggerPwaInstall()">
+            📲 Pasang
+          </button>
+        </div>
+
         <!-- Banner Info / Promo -->
         <div class="promo-banner">
           <div>
@@ -772,14 +786,60 @@
             <div>⚡ <b>Paket:</b> <span id="profCustPlan">-</span></div>
           </div>
 
-          <button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="handleLogout()">
-            🚪 Keluar dari Akun Ini
-          </button>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <button class="btn btn-primary" style="margin-bottom:10px" onclick="triggerPwaInstall()">
+              📲 Pasang / Download Aplikasi di Layar HP
+            </button>
+            <button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="handleLogout()">
+              🚪 Keluar dari Akun Ini
+            </button>
+          </div>
         </div>
       </div>
 
     </div>
 
+  </div>
+
+  <!-- MODAL PANDUAN INSTALL / PASANG DI HP -->
+  <div id="modalInstallGuide" style="position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:999;display:none;align-items:center;justify-content:center;padding:16px">
+    <div style="background:white;width:100%;max-width:420px;border-radius:22px;padding:24px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:16px;font-weight:800;color:#0f172a">📲 Cara Pasang Aplikasi di HP</div>
+        <button onclick="closeInstallGuideModal()" style="border:none;background:#f1f5f9;width:30px;height:30px;border-radius:50%;cursor:pointer;font-weight:800">✕</button>
+      </div>
+
+      <div style="text-align:center;margin-bottom:16px">
+        <img src="/icon.svg" style="width:60px;height:60px;border-radius:16px;box-shadow:0 6px 14px rgba(37,99,235,0.3)">
+        <div style="font-size:15px;font-weight:800;color:#0f172a;margin-top:8px">WBnetwork Internet</div>
+        <div style="font-size:12px;color:var(--muted)">Aplikasi Ringan, Cepat & Tanpa Menghabiskan Memori</div>
+      </div>
+
+      <!-- Panduan Android -->
+      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px">
+        <div style="font-size:12.5px;font-weight:800;color:#15803d;margin-bottom:4px">🤖 Untuk Pengguna Android (Google Chrome):</div>
+        <ol style="font-size:12px;color:#334155;padding-left:18px;line-height:1.6">
+          <li>Tekan tombol titik tiga <b>(⋮)</b> di pojok kanan atas Chrome.</li>
+          <li>Pilih menu <b>"Tambahkan ke Layar Utama (Install App)"</b>.</li>
+          <li>Klik <b>"Install"</b>. Aplikasi langsung muncul di menu HP Anda!</li>
+        </ol>
+      </div>
+
+      <!-- Panduan iPhone -->
+      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:16px">
+        <div style="font-size:12.5px;font-weight:800;color:#0284c7;margin-bottom:4px">🍎 Untuk Pengguna iPhone / iPad (Safari):</div>
+        <ol style="font-size:12px;color:#334155;padding-left:18px;line-height:1.6">
+          <li>Buka web di browser <b>Safari</b>.</li>
+          <li>Tekan ikon <b>Bagikan (Share / Kotak Panah Atas 📤)</b> di bawah layar.</li>
+          <li>Gulir ke bawah dan pilih <b>"Tambah ke Layar Utama (Add to Home Screen) ➕"</b>.</li>
+          <li>Klik <b>"Tambah (Add)"</b> di kanan atas. Selesai!</li>
+        </ol>
+      </div>
+
+      <button class="btn btn-primary" onclick="closeInstallGuideModal()">
+        ✓ Saya Mengerti
+      </button>
+    </div>
   </div>
 
   <!-- ============================================== -->
@@ -819,6 +879,44 @@
     };
 
     const SESSION_KEY = 'wb_customer_session_token';
+    let deferredPwaPrompt = null;
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW register', err));
+      });
+    }
+
+    // Capture Native PWA Install Prompt (Android/Chrome)
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPwaPrompt = e;
+      const banner = document.getElementById('pwaInstallBanner');
+      if (banner) banner.classList.remove('hidden');
+    });
+
+    window.triggerPwaInstall = function() {
+      if (deferredPwaPrompt) {
+        deferredPwaPrompt.prompt();
+        deferredPwaPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('PWA installed');
+          }
+          deferredPwaPrompt = null;
+        });
+      } else {
+        openInstallGuideModal();
+      }
+    };
+
+    function openInstallGuideModal() {
+      document.getElementById('modalInstallGuide').style.display = 'flex';
+    }
+
+    function closeInstallGuideModal() {
+      document.getElementById('modalInstallGuide').style.display = 'none';
+    }
 
     window.addEventListener('DOMContentLoaded', async () => {
       await loadAppSettings();
