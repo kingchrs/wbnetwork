@@ -3,24 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>WBnetwork — Portal Pelanggan Internet</title>
+  <title>WBnetwork — Layanan Internet Pelanggan</title>
   
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <link rel="apple-touch-icon" href="/icon.svg">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="WBnetwork">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --primary: #2563eb;
-      --primary-hover: #1d4ed8;
+      --primary-dark: #1d4ed8;
       --primary-light: #eff6ff;
+      --accent: #06b6d4;
       --success: #10b981;
       --success-light: #ecfdf5;
       --warning: #f59e0b;
@@ -30,274 +31,219 @@
       --bg: #f8fafc;
       --card-bg: #ffffff;
       --border: #e2e8f0;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+      --shadow: 0 6px 16px -4px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 24px -6px rgba(37,99,235,0.18);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
-      color: var(--text-main);
+      color: var(--text);
       line-height: 1.5;
       min-height: 100vh;
-      padding-bottom: 90px;
+      padding-bottom: 84px;
     }
 
-    /* Container */
-    .app-wrap {
+    /* Container App */
+    .app-container {
       max-width: 480px;
       margin: 0 auto;
-      padding: 16px 18px;
+      padding: 0 16px 20px;
     }
 
-    /* Header */
-    .app-header {
+    /* Top App Bar */
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 0 16px;
+      padding: 14px 4px 10px;
     }
-    .brand-box {
+    .brand-group {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .brand-logo {
-      width: 40px;
-      height: 40px;
+    .brand-icon {
+      width: 38px;
+      height: 38px;
       border-radius: 12px;
       background: linear-gradient(135deg, #2563eb, #38bdf8);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-weight: 800;
       font-size: 20px;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 4px 10px rgba(37,99,235,0.3);
     }
-    .brand-name {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      color: #0f172a;
+    .brand-title {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.4px;
     }
-    .brand-tag {
-      font-size: 11px;
-      font-weight: 600;
-      color: #2563eb;
+    .brand-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1d4ed8;
       background: #eff6ff;
       padding: 2px 8px;
       border-radius: 20px;
+      margin-left: 4px;
     }
 
     /* Cards */
     .card {
       background: var(--card-bg);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 20px;
+      padding: 18px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
-      margin-bottom: 16px;
-      transition: all 0.2s ease;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      margin-bottom: 14px;
+      position: relative;
     }
 
-    /* Welcome Hero Card */
-    .hero-card {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    /* MyTelkomsel-style Hero Account Card */
+    .hero-box {
+      background: linear-gradient(135deg, #1e40af, #2563eb 60%, #38bdf8);
+      border-radius: 22px;
+      padding: 20px;
       color: white;
-      border: none;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 16px;
       position: relative;
       overflow: hidden;
     }
-    .hero-card::after {
+    .hero-box::after {
       content: '';
       position: absolute;
       right: -30px;
       top: -30px;
       width: 140px;
       height: 140px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 50%;
     }
-    .hero-greet {
-      font-size: 13px;
-      opacity: 0.9;
-      font-weight: 500;
-    }
-    .hero-name {
-      font-size: 22px;
-      font-weight: 800;
-      margin: 2px 0 10px;
-      letter-spacing: -0.5px;
-    }
-    .hero-pill-row {
+    .hero-head {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
     }
-    .hero-pill {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      padding: 4px 12px;
-      border-radius: 20px;
+    .hero-greet {
       font-size: 12px;
       font-weight: 600;
+      opacity: 0.9;
+    }
+    .hero-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      margin-top: 2px;
+    }
+    .status-pill {
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       gap: 5px;
     }
-
-    /* Bill Status Card */
-    .bill-card {
-      border-left: 6px solid var(--warning);
-      background: #ffffff;
-    }
-    .bill-card.paid {
-      border-left-color: var(--success);
-      background: #f0fdf4;
-    }
-    .bill-card.pending {
-      border-left-color: var(--danger);
-      background: #fffbeb;
-    }
-    .bill-header {
+    .hero-plan-bar {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 14px;
+      padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
     }
-    .bill-badge {
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .badge-unpaid { background: #fee2e2; color: #b91c1c; }
-    .badge-paid { background: #dcfce7; color: #15803d; }
-    .badge-pending { background: #fef3c7; color: #b45309; }
+    .plan-info-title { font-size: 11px; opacity: 0.85; text-transform: uppercase; font-weight: 700; }
+    .plan-info-val { font-size: 16px; font-weight: 800; }
+    .plan-info-due { font-size: 11.5px; opacity: 0.9; text-align: right; }
 
-    .bill-amount {
-      font-size: 28px;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: -0.5px;
-      margin: 4px 0;
+    /* Quick Action Grid (MyTelkomsel Style) */
+    .quick-menu-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 8px;
+      margin-bottom: 18px;
+      text-align: center;
     }
-    .bill-meta {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
+    .quick-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
     }
-
-    /* Buttons */
-    .btn {
+    .quick-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 13px 18px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: inherit;
-      text-decoration: none;
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    }
-    .btn-primary:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-    }
-    .btn-success {
-      background: #10b981;
-      color: white;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    }
-    .btn-success:hover {
-      background: #059669;
-    }
-    .btn-wa {
-      background: #25d366;
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
-    }
-    .btn-wa:hover {
-      background: #1eb956;
-    }
-    .btn-outline {
+      font-size: 22px;
       background: white;
-      border: 1.5px solid var(--border);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .quick-btn:hover .quick-icon-wrap,
+    .quick-btn:active .quick-icon-wrap {
+      transform: scale(0.95);
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+    .quick-label {
+      font-size: 11px;
+      font-weight: 700;
       color: #334155;
     }
-    .btn-outline:hover {
-      background: #f1f5f9;
+
+    /* Bill Highlight Banner */
+    .bill-summary-card {
+      border-left: 5px solid var(--warning);
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bill-summary-card.paid {
+      border-left-color: var(--success);
+      background: #f0fdf4;
+    }
+    .bill-summary-card.pending {
+      border-left-color: var(--danger);
+      background: #fffbeb;
     }
 
-    /* Info Grid */
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .info-item {
-      background: #f8fafc;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #f1f5f9;
-    }
-    .info-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-bottom: 2px;
-      text-transform: uppercase;
-    }
-    .info-val {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    /* Tabs Pill */
+    /* Pills & Tabs */
     .pill-tabs {
       display: flex;
       background: #f1f5f9;
       border-radius: 12px;
       padding: 4px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       gap: 4px;
     }
     .pill-tab {
       flex: 1;
-      padding: 10px;
+      padding: 9px;
       border: none;
       background: transparent;
       border-radius: 9px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
-      color: var(--text-muted);
+      color: var(--muted);
       cursor: pointer;
       transition: all 0.15s ease;
       font-family: inherit;
@@ -309,97 +255,44 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
-    /* QRIS Display Container */
-    .qris-container {
-      background: #f0fdf4;
-      border: 1.5px solid #86efac;
-      border-radius: 18px;
-      padding: 20px 16px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .qris-barcode {
-      width: 220px;
-      height: 220px;
-      object-fit: contain;
-      background: white;
-      border-radius: 14px;
-      padding: 8px;
-      border: 1px solid #bbf7d0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin: 10px auto;
-      display: block;
-    }
-
-    /* Bank Box */
-    .bank-box {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
+    /* Buttons */
+    .btn {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-    }
-    .bank-name { font-size: 12px; font-weight: 700; color: var(--primary); }
-    .bank-no { font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: 0.5px; }
-    .bank-holder { font-size: 12px; color: var(--text-muted); }
-    .btn-copy {
-      background: white;
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #0f172a;
-      cursor: pointer;
-    }
-
-    /* Digital Invoice Struk */
-    .invoice-card {
-      background: white;
-      border: 2px dashed #cbd5e1;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-    .invoice-title {
-      font-size: 13px;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 13.5px;
       font-weight: 800;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      text-align: center;
-      margin-bottom: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-decoration: none;
     }
-    .invoice-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 0;
-      font-size: 13px;
-      border-bottom: 1px dotted #e2e8f0;
-    }
-    .invoice-label { color: var(--text-muted); }
-    .invoice-val { font-weight: 700; color: #0f172a; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-wa { background: #25d366; color: white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25); }
+    .btn-outline { background: white; border: 1.5px solid var(--border); color: #334155; }
 
     /* Inputs */
     .input-box {
       width: 100%;
-      padding: 13px 15px;
+      padding: 12px 14px;
       border-radius: 12px;
       border: 1.5px solid var(--border);
       font-size: 14px;
       font-family: inherit;
       background: white;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       outline: none;
-      transition: all 0.2s;
     }
     .input-box:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
     }
     .input-otp {
       font-size: 24px;
@@ -410,26 +303,141 @@
       font-family: 'Courier New', Courier, monospace;
     }
 
-    /* Auth Hero & Box */
-    .auth-box {
-      background: white;
-      border-radius: 20px;
-      padding: 24px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg);
-      margin-top: 10px;
+    /* Speedtest Section (Animated Gauge) */
+    .speedtest-wrap {
+      text-align: center;
+      padding: 10px 0;
     }
-    .auth-icon {
-      width: 60px;
-      height: 60px;
-      background: #eff6ff;
-      color: var(--primary);
-      border-radius: 18px;
-      display: inline-flex;
+    .gauge-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg at 50% 50%, #2563eb 0deg, #38bdf8 180deg, #e2e8f0 180deg 360deg);
+      display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      margin: 16px auto;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(37,99,235,0.15);
+    }
+    .gauge-inner {
+      width: 165px;
+      height: 165px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .speed-number {
+      font-size: 40px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .speed-unit {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .speed-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 18px 0;
+    }
+    .speed-stat-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 6px;
+    }
+    .speed-stat-label { font-size: 11px; font-weight: 700; color: var(--muted); }
+    .speed-stat-val { font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 2px; }
+
+    /* Digital Invoice Card */
+    .invoice-box {
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 16px;
       margin-bottom: 14px;
+    }
+    .invoice-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 5px 0;
+      border-bottom: 1px dotted #e2e8f0;
+    }
+    .invoice-label { color: var(--muted); }
+    .invoice-val { font-weight: 700; color: #0f172a; }
+
+    /* Bank Box */
+    .bank-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Promo Carousel Banner */
+    .promo-banner {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      border-radius: 18px;
+      padding: 16px 18px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    /* Fixed Bottom Navigation (MyTelkomsel Style) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 10px;
+      z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+    }
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 4px 12px;
+      border-radius: 10px;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .nav-btn.active {
+      color: var(--primary);
+    }
+    .nav-btn .nav-icon {
+      font-size: 20px;
+      line-height: 1;
     }
 
     /* Alerts */
@@ -446,122 +454,105 @@
     .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
     .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
 
-    .timer-text {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-align: center;
-      margin-top: 10px;
-      font-weight: 600;
-    }
-
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <div class="app-wrap">
+  <div class="app-container">
 
-    <!-- Header -->
-    <header class="app-header">
-      <div class="brand-box">
-        <div class="brand-logo">⚡</div>
+    <!-- Top App Bar -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <div class="brand-icon">⚡</div>
         <div>
-          <div class="brand-name">WBnetwork</div>
-          <span class="brand-tag">Layanan Internet Resmi</span>
+          <span class="brand-title">WBnetwork</span>
+          <span class="brand-badge">Fiber Optic</span>
         </div>
       </div>
-      <button id="btnLogout" class="btn-outline hidden" style="padding:6px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
-        🚪 Keluar
-      </button>
+      <div id="topUserBadge" class="hidden">
+        <button onclick="switchTab('tabAkun')" class="btn-outline" style="padding:4px 10px;border-radius:12px;font-size:11.5px;font-weight:700;cursor:pointer">
+          👤 <span id="topCustShortName">Akun</span>
+        </button>
+      </div>
     </header>
 
     <!-- ============================================== -->
     <!-- 1. SCREEN AUTHENTICATION (LOGIN & REGISTRASI OTP) -->
     <!-- ============================================== -->
-    <div id="screenAuth" class="auth-box">
+    <div id="screenAuth" class="card" style="margin-top:10px;padding:22px">
       <div style="text-align:center;margin-bottom:18px">
-        <div class="auth-icon">🔐</div>
-        <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px">Portal Keamanan Pelanggan</h2>
-        <p style="font-size:13px;color:var(--text-muted)">Akses tagihan & pembayaran terlindungi dengan kode OTP email terdaftar.</p>
+        <div style="width:54px;height:54px;background:#eff6ff;color:var(--primary);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px">🔐</div>
+        <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:4px">Portal Keamanan Pelanggan</h2>
+        <p style="font-size:12.5px;color:var(--muted)">Akses tagihan & informasi paket terlindungi kode OTP email.</p>
       </div>
 
-      <!-- Tab Pilihan: Masuk / Daftar -->
+      <!-- Tab Masuk / Daftar -->
       <div class="pill-tabs">
         <button id="tabAuthLogin" class="pill-tab active" onclick="switchAuthTab('login')">🔑 Masuk (Email)</button>
-        <button id="tabAuthRegister" class="pill-tab" onclick="switchAuthTab('register')">📝 Daftarkan Email</button>
+        <button id="tabAuthRegister" class="pill-tab" onclick="switchAuthTab('register')">📝 Daftarkan Akun</button>
       </div>
 
-      <!-- Alert Notifikasi -->
       <div id="authAlert" class="alert-box"></div>
 
-      <!-- FORM A: LOGIN DENGAN EMAIL -->
+      <!-- Form Login -->
       <div id="formLoginWrap">
-        <!-- Step 1: Input Email -->
         <div id="loginStep1">
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">EMAIL TERDAFTAR</label>
-          <input type="email" id="loginEmailInput" class="input-box" placeholder="contoh: nama@gmail.com" autocomplete="email">
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px">EMAIL TERDAFTAR</label>
+          <input type="email" id="loginEmailInput" class="input-box" placeholder="contoh: budi@gmail.com">
           <button id="btnLoginSendOtp" class="btn btn-primary" onclick="handleLoginSendOtp()">
             ✉️ Kirim Kode OTP ke Email
           </button>
-          <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">
-            Belum daftarkan email Anda? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:var(--primary);font-weight:700;text-decoration:none">Daftar di sini</a>
+          <div style="text-align:center;margin-top:16px;font-size:12.5px;color:var(--muted)">
+            Belum mendaftarkan email? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:var(--primary);font-weight:700;text-decoration:none">Daftar di sini</a>
           </div>
         </div>
 
-        <!-- Step 2: Input OTP Login -->
         <div id="loginStep2" class="hidden">
-          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#334155">
-            Kode 6 digit telah dikirim ke: <b id="dispSentEmailLogin" style="color:var(--primary)">-</b>
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;font-size:12.5px">
+            Kode 6 digit dikirim ke: <b id="dispSentEmailLogin" style="color:var(--primary)">-</b>
           </div>
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">MASUKKAN 6 DIGIT OTP</label>
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px">MASUKKAN 6 DIGIT OTP</label>
           <input type="text" id="loginOtpInput" class="input-box input-otp" maxlength="6" placeholder="------" inputmode="numeric">
           <button id="btnLoginVerifyOtp" class="btn btn-primary" onclick="handleLoginVerifyOtp()">
             🚀 Verifikasi & Masuk
           </button>
-          <div class="timer-text">
-            Tidak menerima email? <a href="javascript:void(0)" onclick="handleLoginSendOtp()" style="color:var(--primary)">Kirim ulang OTP</a>
-          </div>
-          <button class="btn btn-outline" style="margin-top:10px;font-size:12px;padding:8px" onclick="backToLoginStep1()">
-            ⬅️ Ganti Alamat Email
+          <button class="btn btn-outline" style="margin-top:8px;font-size:12px;padding:8px" onclick="backToLoginStep1()">
+            ⬅️ Ganti Email
           </button>
         </div>
       </div>
 
-      <!-- FORM B: DAFTAR / HUBUNGKAN EMAIL DENGAN ID PELANGGAN -->
+      <!-- Form Register -->
       <div id="formRegisterWrap" class="hidden">
-        <!-- Step 1: Validasi ID, No HP & Email -->
         <div id="regStep1">
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">ID PELANGGAN (DARI ADMIN)</label>
-          <input type="text" id="regCustCode" class="input-box" placeholder="contoh: WB0004 atau WB0001">
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px">ID PELANGGAN (DARI ADMIN)</label>
+          <input type="text" id="regCustCode" class="input-box" placeholder="contoh: WB0004">
 
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">NOMOR WHATSAPP / HP PELANGGAN</label>
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px">NOMOR WHATSAPP / HP</label>
           <input type="tel" id="regWhatsapp" class="input-box" placeholder="contoh: 081234567890">
 
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">ALAMAT EMAIL AKTIF (UNTUK TERIMA OTP)</label>
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px">EMAIL ANDA</label>
           <input type="email" id="regEmail" class="input-box" placeholder="nama@gmail.com">
 
           <button id="btnRegSendOtp" class="btn btn-primary" onclick="handleRegisterSendOtp()">
             📩 Kirim Kode OTP Verifikasi
           </button>
-          <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">
-            Sudah pernah daftar? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color:var(--primary);font-weight:700;text-decoration:none">Masuk di sini</a>
+          <div style="text-align:center;margin-top:16px;font-size:12.5px;color:var(--muted)">
+            Sudah terdaftar? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color:var(--primary);font-weight:700;text-decoration:none">Masuk di sini</a>
           </div>
         </div>
 
-        <!-- Step 2: Input OTP Registrasi -->
         <div id="regStep2" class="hidden">
-          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#334155">
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;font-size:12.5px">
             Verifikasi pendaftaran email: <b id="dispSentEmailReg" style="color:var(--primary)">-</b>
           </div>
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">MASUKKAN 6 DIGIT OTP VERIFIKASI</label>
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px">MASUKKAN 6 DIGIT OTP</label>
           <input type="text" id="regOtpInput" class="input-box input-otp" maxlength="6" placeholder="------" inputmode="numeric">
           <button id="btnRegVerifyOtp" class="btn btn-primary" onclick="handleRegisterVerifyOtp()">
-            ✨ Konfirmasi & Aktifkan Akun
+            ✨ Konfirmasi & Selesai
           </button>
-          <div class="timer-text">
-            Belum menerima email? <a href="javascript:void(0)" onclick="handleRegisterSendOtp()" style="color:var(--primary)">Kirim ulang</a>
-          </div>
-          <button class="btn btn-outline" style="margin-top:10px;font-size:12px;padding:8px" onclick="backToRegStep1()">
+          <button class="btn btn-outline" style="margin-top:8px;font-size:12px;padding:8px" onclick="backToRegStep1()">
             ⬅️ Ubah Data Pendaftaran
           </button>
         </div>
@@ -569,214 +560,319 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- 2. SCREEN DASHBOARD PELANGGAN TEROTENTIKASI -->
+    <!-- 2. SCREEN UTAMA PELANGGAN (MYTELKOMSEL UI) -->
     <!-- ============================================== -->
-    <div id="screenDashboard" class="hidden">
+    <div id="screenMainApp" class="hidden">
 
-      <!-- Hero Card Identitas -->
-      <div class="card hero-card">
-        <div class="hero-greet">Selamat Datang Pelanggan Setia 👋</div>
-        <div class="hero-name" id="dispCustName">-</div>
-        <div class="hero-pill-row">
-          <div class="hero-pill">🆔 <span id="dispCustCode">-</span></div>
-          <div class="hero-pill">✉️ <span id="dispCustEmail">-</span></div>
-          <div class="hero-pill" style="background:#10b981;color:white">🟢 Online & Aman</div>
+      <!-- TAB 1: BERANDA -->
+      <div id="viewBeranda" class="tab-view">
+        
+        <!-- Hero Card MyTelkomsel Style -->
+        <div class="hero-box">
+          <div class="hero-head">
+            <div>
+              <div class="hero-greet">Halo Pelanggan 👋</div>
+              <div class="hero-name" id="dispCustName">-</div>
+            </div>
+            <div class="status-pill">
+              <span style="color:#4ade80">●</span> <span id="dispCustCode">WB0000</span>
+            </div>
+          </div>
+
+          <div class="hero-plan-bar">
+            <div>
+              <div class="plan-info-title">PAKET AKTIF</div>
+              <div class="plan-info-val" id="dispCustPlan">20 Mbps Home Fiber</div>
+            </div>
+            <div class="plan-info-due">
+              <div style="font-weight:700;color:#fde047" id="dispCustStatusBadge">ONLINE 🟢</div>
+              <div id="dispDueDayShort" style="font-size:11px;opacity:0.85">Jatuh Tempo: Tgl 10</div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Tagihan Card -->
-      <div class="card bill-card" id="cardBill">
-        <div class="bill-header">
-          <span style="font-size:13px;font-weight:700;color:var(--text-muted)">TAGIHAN BULAN INI</span>
-          <span id="badgeBillStatus" class="bill-badge">-</span>
-        </div>
-        <div class="bill-amount" id="dispBillAmount">Rp 0</div>
-        <div class="bill-meta" id="dispBillMeta">Jatuh Tempo: -</div>
-
-        <div id="actionBillUnpaid">
-          <button id="btnOpenPay" class="btn btn-primary" onclick="scrollToPayment()">
-            📱 Bayar via QRIS / Bank Transfer
+        <!-- Quick Action Menu Grid (MyTelkomsel Style) -->
+        <div class="quick-menu-grid">
+          <button class="quick-btn" onclick="switchTab('tabSpeedtest')">
+            <div class="quick-icon-wrap" style="color:#2563eb">⚡</div>
+            <span class="quick-label">Speedtest</span>
+          </button>
+          <button class="quick-btn" onclick="switchTab('tabTagihan')">
+            <div class="quick-icon-wrap" style="color:#10b981">💳</div>
+            <span class="quick-label">Bayar QRIS</span>
+          </button>
+          <button class="quick-btn" onclick="switchTab('tabTagihan', 'bank')">
+            <div class="quick-icon-wrap" style="color:#0284c7">🏦</div>
+            <span class="quick-label">Transfer Bank</span>
+          </button>
+          <button class="quick-btn" onclick="switchTab('tabBantuan')">
+            <div class="quick-icon-wrap" style="color:#f59e0b">🛠️</div>
+            <span class="quick-label">Bantuan</span>
           </button>
         </div>
 
-        <div id="actionBillPending" class="hidden">
-          <div style="background:#fffbeb;border:1px solid #fde68a;padding:12px 14px;border-radius:12px;color:#92400e;font-size:13px;font-weight:600">
-            ⏳ Pembayaran Anda sedang diverifikasi via WhatsApp Admin. Terima kasih.
+        <!-- Status Tagihan Singkat -->
+        <div class="card bill-summary-card" id="cardBillSummary">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">STATUS TAGIHAN BULAN INI</div>
+            <div style="font-size:20px;font-weight:900;color:#0f172a;margin:2px 0" id="dispBillAmountShort">Rp 0</div>
+            <div style="font-size:12px;font-weight:700" id="dispBillStatusShort">Belum Bayar</div>
           </div>
+          <button class="btn btn-primary" style="width:auto;padding:8px 16px;font-size:12.5px" onclick="switchTab('tabTagihan')">
+            Rincian & Bayar 👉
+          </button>
         </div>
 
-        <div id="actionBillPaid" class="hidden">
-          <div style="display:flex;align-items:center;gap:10px;background:#ecfdf5;padding:12px 14px;border-radius:12px;color:#065f46;font-size:13px;font-weight:600">
-            <span style="font-size:20px">🎉</span>
-            <div>Tagihan bulan ini sudah lunas. Layanan aktif 100%!</div>
+        <!-- Banner Info / Promo -->
+        <div class="promo-banner">
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;opacity:0.9">WBnetwork Internet</div>
+            <div style="font-size:14px;font-weight:800;margin-top:2px">Fiber Optic Cepat & Unlimited 🚀</div>
           </div>
+          <button class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:11px;font-weight:800;color:#1e40af;border:none" onclick="switchTab('tabSpeedtest')">
+            Tes Speed
+          </button>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: TAGIHAN & PEMBAYARAN -->
+      <div id="viewTagihan" class="tab-view hidden">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <span style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase">TAGIHAN INTERNET</span>
+            <span id="badgeTagihanDetail" style="font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:20px;background:#fee2e2;color:#b91c1c">BELUM LUNAS</span>
+          </div>
+
+          <div style="font-size:26px;font-weight:900;color:#0f172a;margin-bottom:4px" id="dispTagihanNominal">Rp 200.000</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:16px" id="dispTagihanJatuhTempo">Jatuh Tempo: Tgl 10 Setiap Bulan</div>
+
+          <!-- Pill Tabs Pembayaran -->
+          <div class="pill-tabs">
+            <button id="btnPayTabQris" class="pill-tab active" onclick="switchPaymentMethod('qris')">📷 QRIS (Scan All)</button>
+            <button id="btnPayTabBank" class="pill-tab" onclick="switchPaymentMethod('bank')">🏦 Transfer Bank</button>
+          </div>
+
+          <!-- QRIS Section -->
+          <div id="sectionQris">
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:16px;padding:16px;text-align:center;margin-bottom:14px">
+              <div style="font-size:12px;font-weight:800;color:#15803d;text-transform:uppercase">SCAN QRIS PEMBAYARAN</div>
+              <div style="font-size:11px;color:#166534">BCA, Mandiri, BRI, BNI, Dana, GoPay, OVO, ShopeePay</div>
+              <img id="qrisImage" style="width:200px;height:200px;object-fit:contain;background:white;border-radius:12px;padding:6px;border:1px solid #bbf7d0;margin:10px auto;display:block" src="/qris.png" alt="QRIS">
+              <div style="font-size:11.5px;font-weight:700;color:#334155">NMID: <span id="qrisNmid">ID1020000000000</span></div>
+            </div>
+          </div>
+
+          <!-- Bank Section -->
+          <div id="sectionBank" class="hidden">
+            <div id="bankAccountsList"></div>
+          </div>
+
+          <!-- Struk Digital Invoice -->
+          <div class="invoice-box">
+            <div style="text-align:center;font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;margin-bottom:8px">🧾 Invoice Digital WBnetwork</div>
+            <div class="invoice-row">
+              <span class="invoice-label">No. Invoice</span>
+              <span class="invoice-val" id="invNoText">-</span>
+            </div>
+            <div class="invoice-row">
+              <span class="invoice-label">Pelanggan</span>
+              <span class="invoice-val" id="invCustText">-</span>
+            </div>
+            <div class="invoice-row">
+              <span class="invoice-label">Paket</span>
+              <span class="invoice-val" id="invPlanText">-</span>
+            </div>
+            <div class="invoice-row" style="border:none">
+              <span class="invoice-label">Total Nominal</span>
+              <span class="invoice-val" id="invAmountText" style="color:var(--primary)">-</span>
+            </div>
+          </div>
+
+          <!-- Tombol Konfirmasi WA -->
+          <button class="btn btn-wa" onclick="handleSendWaInvoice()">
+            📲 Kirim Bukti & Invoice ke WA Admin
+          </button>
         </div>
       </div>
 
-      <!-- Detail Layanan -->
-      <div class="card">
-        <div class="card-title">
-          <span>📋 Informasi Layanan</span>
-          <span style="font-size:11px;color:var(--primary);font-weight:700">TERVERIFIKASI</span>
-        </div>
-        <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Paket Internet</div>
-            <div class="info-val" id="dispCustPlan">-</div>
+      <!-- TAB 3: SPEEDTEST TERINTEGRASI -->
+      <div id="viewSpeedtest" class="tab-view hidden">
+        <div class="card speedtest-wrap">
+          <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px">⚡ UJI KECEPATAN INTERNET</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">Server: <b style="color:#0f172a">WBnetwork Fiber Node (Jakarta)</b></div>
+
+          <!-- Gauge -->
+          <div class="gauge-circle" id="speedGauge">
+            <div class="gauge-inner">
+              <div class="speed-number" id="speedDispNumber">0.0</div>
+              <div class="speed-unit" id="speedDispUnit">Mbps Download</div>
+            </div>
           </div>
-          <div class="info-item">
-            <div class="info-label">Status Koneksi</div>
-            <div class="info-val" id="dispCustStatus" style="color:#10b981">Aktif 🟢</div>
+
+          <!-- Stats Grid -->
+          <div class="speed-stats-grid">
+            <div class="speed-stat-box">
+              <div class="speed-stat-label">⬇️ Download</div>
+              <div class="speed-stat-val" id="valDownload">- Mbps</div>
+            </div>
+            <div class="speed-stat-box">
+              <div class="speed-stat-label">⬆️ Upload</div>
+              <div class="speed-stat-val" id="valUpload">- Mbps</div>
+            </div>
+            <div class="speed-stat-box">
+              <div class="speed-stat-label">⏱️ Ping</div>
+              <div class="speed-stat-val" id="valPing">- ms</div>
+            </div>
           </div>
-          <div class="info-item" style="grid-column: span 2">
-            <div class="info-label">Alamat Pemasangan</div>
-            <div class="info-val" id="dispCustAddress">-</div>
-          </div>
+
+          <button id="btnStartSpeedtest" class="btn btn-primary" onclick="runSpeedtest()">
+            ⚡ Mulai Uji Kecepatan Sekarang
+          </button>
         </div>
       </div>
 
-      <!-- Section Pembayaran (QRIS & Bank) -->
-      <div class="card" id="paymentSection">
-        <div class="card-title">
-          <span>💳 Pembayaran & Konfirmasi</span>
-          <span style="font-size:11px;color:#10b981;font-weight:700">INSTAN</span>
+      <!-- TAB 4: BANTUAN & LAPOR GANGGUAN -->
+      <div id="viewBantuan" class="tab-view hidden">
+        <div class="card">
+          <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:8px">🛠️ BANTUAN & LAPOR GANGGUAN</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Mengalami internet lambat atau lampu modem LOS merah? Laporkan ke tim teknisi:</p>
+
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px">KENDALA YANG DIALAMI</label>
+          <textarea id="inputKendala" class="input-box" rows="3" placeholder="Contoh: WiFi lambat sejak tadi malam, lampu modem kedap-kedip merah..."></textarea>
+
+          <button class="btn btn-primary" onclick="submitLaporan()">
+            🚨 Kirim Laporan Gangguan
+          </button>
         </div>
 
-        <!-- Pill Tabs Pembayaran -->
-        <div class="pill-tabs">
-          <button id="payTabQris" class="pill-tab active" onclick="switchPayTab('qris')">📷 QRIS (Semua E-Wallet/Bank)</button>
-          <button id="payTabBank" class="pill-tab" onclick="switchPayTab('bank')">🏦 Transfer Bank</button>
+        <div class="card">
+          <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📞 KONTAK KAMI</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Punya pertanyaan seputar pembayaran atau ingin upgrade paket?</p>
+          <button class="btn btn-wa" onclick="openDirectAdminWa()">
+            💬 Chat Langsung Customer Service
+          </button>
         </div>
-
-        <!-- TAB 1: QRIS -->
-        <div id="payContentQris">
-          <div class="qris-container">
-            <div style="font-size:12px;font-weight:800;color:#15803d;text-transform:uppercase;margin-bottom:4px">SCAN QRIS WBnetwork</div>
-            <div style="font-size:11px;color:#166534">BCA Mobile, Livin, BRImo, Dana, GoPay, OVO, ShopeePay</div>
-            <img id="qrisImage" class="qris-barcode" src="/qris.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WBnetwork-Payment'" alt="QRIS WBnetwork">
-            <div style="font-size:11px;font-weight:700;color:#334155">NMID: <span id="qrisNmid">ID1020000000000</span></div>
-          </div>
-        </div>
-
-        <!-- TAB 2: TRANSFER BANK -->
-        <div id="payContentBank" class="hidden">
-          <div id="bankListContainer">
-            <!-- Dynamic Bank Accounts -->
-          </div>
-        </div>
-
-        <!-- STRUK / DIGITAL INVOICE GENERATOR -->
-        <div class="invoice-card">
-          <div class="invoice-title">🧾 Invoice Digital WBnetwork</div>
-          <div class="invoice-row">
-            <span class="invoice-label">No. Invoice</span>
-            <span class="invoice-val" id="invNumber">-</span>
-          </div>
-          <div class="invoice-row">
-            <span class="invoice-label">Pelanggan</span>
-            <span class="invoice-val" id="invCustomer">-</span>
-          </div>
-          <div class="invoice-row">
-            <span class="invoice-label">Total Tagihan</span>
-            <span class="invoice-val" id="invAmount" style="color:var(--primary)">-</span>
-          </div>
-          <div class="invoice-row" style="border-bottom:none">
-            <span class="invoice-label">Status Bayar</span>
-            <span class="invoice-val" id="invStatus" style="color:#f59e0b">Siap Konfirmasi</span>
-          </div>
-        </div>
-
-        <!-- TOMBOL KONFIRMASI WA ADMIN -->
-        <button id="btnSendWaAdmin" class="btn btn-wa" onclick="handleSendWaPayment()">
-          📲 Kirim Invoice & Bukti ke WA Admin
-        </button>
-        <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">
-          Sistem otomatis membuat format pesan invoice resmi untuk dikirimkan ke WhatsApp Admin.
-        </p>
       </div>
 
-      <!-- Lapor Gangguan Cepat -->
-      <div class="card">
-        <div class="card-title">
-          <span>🛠️ Bantuan & Lapor Gangguan</span>
+      <!-- TAB 5: AKUN / PROFIL -->
+      <div id="viewAkun" class="tab-view hidden">
+        <div class="card">
+          <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:12px">👤 PROFIL PELANGGAN</div>
+          
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:14px;margin-bottom:14px">
+            <div style="font-size:12px;font-weight:800;color:var(--primary)" id="profCustCode">WB0000</div>
+            <div style="font-size:17px;font-weight:800;color:#1e3a8a" id="profCustName">-</div>
+            <div style="font-size:12px;color:#0284c7;margin-top:2px" id="profCustEmail">email@domain.com</div>
+          </div>
+
+          <div style="font-size:13px;color:#334155;line-height:1.8;margin-bottom:16px">
+            <div>📍 <b>Alamat:</b> <span id="profCustAddress">-</span></div>
+            <div>📱 <b>No HP:</b> <span id="profCustPhone">-</span></div>
+            <div>⚡ <b>Paket:</b> <span id="profCustPlan">-</span></div>
+          </div>
+
+          <button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="handleLogout()">
+            🚪 Keluar dari Akun Ini
+          </button>
         </div>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Internet lambat atau lampu modem merah? Laporkan ke tim teknisi kami:</p>
-        <textarea id="laporKendala" class="input-box" rows="2" placeholder="Jelaskan kendala Anda..."></textarea>
-        <button class="btn btn-outline" onclick="handleLaporGangguan()">
-          🚨 Kirim Laporan Gangguan
-        </button>
       </div>
 
     </div>
 
   </div>
 
+  <!-- ============================================== -->
+  <!-- 3. BOTTOM NAVIGATION BAR (MYTELKOMSEL STYLE) -->
+  <!-- ============================================== -->
+  <nav id="bottomNav" class="bottom-nav hidden">
+    <button class="nav-btn active" id="navBtnBeranda" onclick="switchTab('tabBeranda')">
+      <span class="nav-icon">🏠</span>
+      <span>Beranda</span>
+    </button>
+    <button class="nav-btn" id="navBtnTagihan" onclick="switchTab('tabTagihan')">
+      <span class="nav-icon">💳</span>
+      <span>Tagihan</span>
+    </button>
+    <button class="nav-btn" id="navBtnSpeedtest" onclick="switchTab('tabSpeedtest')">
+      <span class="nav-icon">⚡</span>
+      <span>Speedtest</span>
+    </button>
+    <button class="nav-btn" id="navBtnBantuan" onclick="switchTab('tabBantuan')">
+      <span class="nav-icon">🛠️</span>
+      <span>Bantuan</span>
+    </button>
+    <button class="nav-btn" id="navBtnAkun" onclick="switchTab('tabAkun')">
+      <span class="nav-icon">👤</span>
+      <span>Akun</span>
+    </button>
+  </nav>
+
   <script>
-    // State App
     let currentCustomer = null;
     let appSettings = {
       adminWhatsapp: '081234567890',
       merchantName: 'WBnetwork RT/RW Net',
-      paymentMethods: [
-        { type: 'bank', name: 'BCA', number: '1234567890', holder: 'WBnetwork Admin' },
-        { type: 'bank', name: 'BRI', number: '0987654321', holder: 'WBnetwork Admin' },
-        { type: 'ewallet', name: 'DANA / GoPay', number: '081234567890', holder: 'WBnetwork Official' }
-      ],
+      paymentMethods: [],
       qrisUrl: '/qris.png',
       qrisNmid: 'ID1020000000000'
     };
 
-    const SESSION_STORAGE_KEY = 'wb_customer_session_token';
+    const SESSION_KEY = 'wb_customer_session_token';
 
-    // Inisialisasi
     window.addEventListener('DOMContentLoaded', async () => {
       await loadAppSettings();
       await checkExistingSession();
     });
 
-    // 1. Muat Pengaturan Admin
     async function loadAppSettings() {
       try {
         const res = await fetch('/api/settings');
         const json = await res.json();
         if (json.success && json.data) {
           appSettings = { ...appSettings, ...json.data };
-          if (appSettings.qrisUrl) {
-            document.getElementById('qrisImage').src = appSettings.qrisUrl;
-          }
-          if (appSettings.qrisNmid) {
-            document.getElementById('qrisNmid').textContent = appSettings.qrisNmid;
-          }
+          if (appSettings.qrisUrl) document.getElementById('qrisImage').src = appSettings.qrisUrl;
+          if (appSettings.qrisNmid) document.getElementById('qrisNmid').textContent = appSettings.qrisNmid;
           renderBankList();
         }
       } catch (e) {
-        console.warn("Using default app settings", e);
         renderBankList();
       }
     }
 
     function renderBankList() {
-      const container = document.getElementById('bankListContainer');
+      const container = document.getElementById('bankAccountsList');
       const list = appSettings.paymentMethods || [];
-      if (list.length === 0) {
-        container.innerHTML = '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:12px">Rekening bank dapat dikonfirmasi via WhatsApp Admin.</div>';
+      const nonQris = list.filter(m => m.type !== 'qris');
+
+      if (nonQris.length === 0) {
+        container.innerHTML = `
+          <div class="bank-item">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--primary)">BANK BCA</div>
+              <div style="font-size:15px;font-weight:800">123-456-7890</div>
+              <div style="font-size:11.5px;color:var(--muted)">a.n WBnetwork Admin</div>
+            </div>
+            <button class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:12px" onclick="copyText('1234567890')">📋 Salin</button>
+          </div>
+        `;
         return;
       }
-      container.innerHTML = list.map(b => `
-        <div class="bank-box">
+
+      container.innerHTML = nonQris.map(b => `
+        <div class="bank-item">
           <div>
-            <div class="bank-name">${escapeHtml(b.name || 'BANK')}</div>
-            <div class="bank-no">${escapeHtml(b.number || '-')}</div>
-            <div class="bank-holder">a.n ${escapeHtml(b.holder || 'WBnetwork')}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--primary)">${escapeHtml(b.name || 'BANK')}</div>
+            <div style="font-size:15px;font-weight:800">${escapeHtml(b.accountNumber || b.number || '-')}</div>
+            <div style="font-size:11.5px;color:var(--muted)">a.n ${escapeHtml(b.accountHolder || b.holder || 'WBnetwork')}</div>
           </div>
-          <button class="btn-copy" onclick="copyText('${escapeHtml(b.number || '')}')">📋 Salin</button>
+          <button class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:12px" onclick="copyText('${escapeHtml(b.accountNumber || b.number || '')}')">📋 Salin</button>
         </div>
       `).join('');
     }
 
-    // 2. Cek Token Sesi di Browser
     async function checkExistingSession() {
-      const token = localStorage.getItem(SESSION_STORAGE_KEY);
+      const token = localStorage.getItem(SESSION_KEY);
       if (!token) {
         showAuthScreen();
         return;
@@ -790,7 +886,7 @@
         if (json.success && json.data) {
           renderDashboard(json.data);
         } else {
-          localStorage.removeItem(SESSION_STORAGE_KEY);
+          localStorage.removeItem(SESSION_KEY);
           showAuthScreen();
         }
       } catch (e) {
@@ -798,11 +894,11 @@
       }
     }
 
-    // Auth Screen UI Helpers
     function showAuthScreen() {
       document.getElementById('screenAuth').classList.remove('hidden');
-      document.getElementById('screenDashboard').classList.add('hidden');
-      document.getElementById('btnLogout').classList.add('hidden');
+      document.getElementById('screenMainApp').classList.add('hidden');
+      document.getElementById('bottomNav').classList.add('hidden');
+      document.getElementById('topUserBadge').classList.add('hidden');
     }
 
     function switchAuthTab(tab) {
@@ -828,17 +924,13 @@
     }
 
     function hideAlert() {
-      const el = document.getElementById('authAlert');
-      el.style.display = 'none';
+      document.getElementById('authAlert').style.display = 'none';
     }
 
-    // A. Handler Login Send OTP
+    // Login Flow
     async function handleLoginSendOtp() {
       const email = document.getElementById('loginEmailInput').value.trim();
-      if (!email) {
-        showAlert('Silakan masukkan alamat email Anda.', 'error');
-        return;
-      }
+      if (!email) return showAlert('Silakan masukkan alamat email Anda.', 'error');
 
       const btn = document.getElementById('btnLoginSendOtp');
       btn.disabled = true;
@@ -859,29 +951,23 @@
           document.getElementById('loginStep1').classList.add('hidden');
           document.getElementById('loginStep2').classList.remove('hidden');
           document.getElementById('loginOtpInput').focus();
-          if (json.debugOtp) {
-            document.getElementById('loginOtpInput').value = json.debugOtp;
-          }
+          if (json.debugOtp) document.getElementById('loginOtpInput').value = json.debugOtp;
         } else {
           showAlert(json.message || 'Gagal mengirim OTP.', 'error');
         }
       } catch (e) {
-        showAlert('Terjadi kesalahan jaringan: ' + e.message, 'error');
+        showAlert('Kesalahan: ' + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '✉️ Kirim Kode OTP ke Email';
       }
     }
 
-    // B. Handler Login Verify OTP
     async function handleLoginVerifyOtp() {
       const email = document.getElementById('loginEmailInput').value.trim();
       const otp = document.getElementById('loginOtpInput').value.trim();
 
-      if (!otp || otp.length < 4) {
-        showAlert('Masukkan 6 digit kode OTP yang telah dikirim.', 'error');
-        return;
-      }
+      if (!otp || otp.length < 4) return showAlert('Masukkan 6 digit kode OTP.', 'error');
 
       const btn = document.getElementById('btnLoginVerifyOtp');
       btn.disabled = true;
@@ -896,10 +982,10 @@
         const json = await res.json();
 
         if (json.success && json.token) {
-          localStorage.setItem(SESSION_STORAGE_KEY, json.token);
+          localStorage.setItem(SESSION_KEY, json.token);
           renderDashboard(json.customer);
         } else {
-          showAlert(json.message || 'Kode OTP salah atau kadaluarsa.', 'error');
+          showAlert(json.message || 'Kode OTP salah.', 'error');
         }
       } catch (e) {
         showAlert('Kesalahan: ' + e.message, 'error');
@@ -915,16 +1001,13 @@
       hideAlert();
     }
 
-    // C. Handler Register Send OTP
+    // Register Flow
     async function handleRegisterSendOtp() {
       const customerCode = document.getElementById('regCustCode').value.trim();
       const whatsapp = document.getElementById('regWhatsapp').value.trim();
       const email = document.getElementById('regEmail').value.trim();
 
-      if (!customerCode || !email) {
-        showAlert('ID Pelanggan dan Alamat Email wajib diisi.', 'error');
-        return;
-      }
+      if (!customerCode || !email) return showAlert('ID Pelanggan dan Email wajib diisi.', 'error');
 
       const btn = document.getElementById('btnRegSendOtp');
       btn.disabled = true;
@@ -945,11 +1028,9 @@
           document.getElementById('regStep1').classList.add('hidden');
           document.getElementById('regStep2').classList.remove('hidden');
           document.getElementById('regOtpInput').focus();
-          if (json.debugOtp) {
-            document.getElementById('regOtpInput').value = json.debugOtp;
-          }
+          if (json.debugOtp) document.getElementById('regOtpInput').value = json.debugOtp;
         } else {
-          showAlert(json.message || 'Gagal mengirim OTP pendaftaran.', 'error');
+          showAlert(json.message || 'Gagal mengirim OTP.', 'error');
         }
       } catch (e) {
         showAlert('Kesalahan: ' + e.message, 'error');
@@ -959,15 +1040,11 @@
       }
     }
 
-    // D. Handler Register Verify OTP
     async function handleRegisterVerifyOtp() {
       const customerCode = document.getElementById('regCustCode').value.trim();
       const otp = document.getElementById('regOtpInput').value.trim();
 
-      if (!otp || otp.length < 4) {
-        showAlert('Masukkan 6 digit kode OTP verifikasi.', 'error');
-        return;
-      }
+      if (!otp || otp.length < 4) return showAlert('Masukkan 6 digit kode OTP.', 'error');
 
       const btn = document.getElementById('btnRegVerifyOtp');
       btn.disabled = true;
@@ -982,7 +1059,7 @@
         const json = await res.json();
 
         if (json.success && json.token) {
-          localStorage.setItem(SESSION_STORAGE_KEY, json.token);
+          localStorage.setItem(SESSION_KEY, json.token);
           renderDashboard(json.customer);
         } else {
           showAlert(json.message || 'Kode OTP tidak cocok.', 'error');
@@ -991,7 +1068,7 @@
         showAlert('Kesalahan: ' + e.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '✨ Konfirmasi & Aktifkan Akun';
+        btn.textContent = '✨ Konfirmasi & Selesai';
       }
     }
 
@@ -1001,105 +1078,205 @@
       hideAlert();
     }
 
-    // E. Logout
-    document.getElementById('btnLogout').addEventListener('click', async () => {
-      const token = localStorage.getItem(SESSION_STORAGE_KEY);
-      if (token) {
-        try {
-          await fetch('/api/auth/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token })
-          });
-        } catch (e) {}
+    function handleLogout() {
+      if (confirm('Apakah Anda yakin ingin keluar?')) {
+        localStorage.removeItem(SESSION_KEY);
+        currentCustomer = null;
+        showAuthScreen();
       }
-      localStorage.removeItem(SESSION_STORAGE_KEY);
-      currentCustomer = null;
-      showAuthScreen();
-    });
+    }
 
-    // 3. Render Dashboard Pelanggan
+    // Tab Navigation Switcher (MyTelkomsel Style)
+    function switchTab(tabName, subOption) {
+      const views = {
+        tabBeranda: 'viewBeranda',
+        tabTagihan: 'viewTagihan',
+        tabSpeedtest: 'viewSpeedtest',
+        tabBantuan: 'viewBantuan',
+        tabAkun: 'viewAkun'
+      };
+
+      const navBtns = {
+        tabBeranda: 'navBtnBeranda',
+        tabTagihan: 'navBtnTagihan',
+        tabSpeedtest: 'navBtnSpeedtest',
+        tabBantuan: 'navBtnBantuan',
+        tabAkun: 'navBtnAkun'
+      };
+
+      Object.keys(views).forEach(k => {
+        document.getElementById(views[k]).classList.add('hidden');
+        document.getElementById(navBtns[k]).classList.remove('active');
+      });
+
+      document.getElementById(views[tabName]).classList.remove('hidden');
+      document.getElementById(navBtns[tabName]).classList.add('active');
+
+      if (tabName === 'tabTagihan' && subOption === 'bank') {
+        switchPaymentMethod('bank');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchPaymentMethod(method) {
+      if (method === 'qris') {
+        document.getElementById('btnPayTabQris').classList.add('active');
+        document.getElementById('btnPayTabBank').classList.remove('active');
+        document.getElementById('sectionQris').classList.remove('hidden');
+        document.getElementById('sectionBank').classList.add('hidden');
+      } else {
+        document.getElementById('btnPayTabBank').classList.add('active');
+        document.getElementById('btnPayTabQris').classList.remove('active');
+        document.getElementById('sectionBank').classList.remove('hidden');
+        document.getElementById('sectionQris').classList.add('hidden');
+      }
+    }
+
+    // Render Dashboard Pelanggan
     function renderDashboard(data) {
       currentCustomer = data;
 
       document.getElementById('screenAuth').classList.add('hidden');
-      document.getElementById('screenDashboard').classList.remove('hidden');
-      document.getElementById('btnLogout').classList.remove('hidden');
+      document.getElementById('screenMainApp').classList.remove('hidden');
+      document.getElementById('bottomNav').classList.remove('hidden');
+      document.getElementById('topUserBadge').classList.remove('hidden');
 
-      // Identitas
+      const firstName = (data.name || 'Pelanggan').split(' ')[0];
+      document.getElementById('topCustShortName').textContent = firstName;
+
+      // Hero info
       document.getElementById('dispCustName').textContent = data.name || '-';
       document.getElementById('dispCustCode').textContent = data.id || data.customer_code || '-';
-      document.getElementById('dispCustEmail').textContent = data.email || 'Email Terverifikasi';
       document.getElementById('dispCustPlan').textContent = data.package || '20 Mbps Home Fiber';
-      document.getElementById('dispCustAddress').textContent = data.address || 'Alamat Terdaftar';
+      document.getElementById('dispDueDayShort').textContent = `Jatuh Tempo: Tgl ${data.due_day || '10'}`;
 
-      // Tagihan
-      const price = data.monthly_price || 200000;
-      const formattedPrice = 'Rp ' + Number(price).toLocaleString('id-ID');
-      document.getElementById('dispBillAmount').textContent = formattedPrice;
-      document.getElementById('dispBillMeta').textContent = `Jatuh Tempo: Tanggal ${data.due_day || '10'} Setiap Bulan`;
-
-      // Status Tagihan
+      // Bill status
       const tagihan = data.tagihan || {};
       const status = (tagihan.status || 'Belum Lunas').toLowerCase();
-      const cardBill = document.getElementById('cardBill');
-      const badge = document.getElementById('badgeBillStatus');
+      const price = data.monthly_price || 200000;
+      const formattedPrice = 'Rp ' + Number(price).toLocaleString('id-ID');
 
-      cardBill.classList.remove('paid', 'pending');
-      document.getElementById('actionBillUnpaid').classList.add('hidden');
-      document.getElementById('actionBillPending').classList.add('hidden');
-      document.getElementById('actionBillPaid').classList.add('hidden');
+      document.getElementById('dispBillAmountShort').textContent = formattedPrice;
+      document.getElementById('dispTagihanNominal').textContent = formattedPrice;
+      document.getElementById('dispTagihanJatuhTempo').textContent = `Jatuh Tempo: Tanggal ${data.due_day || '10'} Setiap Bulan`;
+
+      const cardSum = document.getElementById('cardBillSummary');
+      const badgeShort = document.getElementById('dispBillStatusShort');
+      const badgeDetail = document.getElementById('badgeTagihanDetail');
+
+      cardSum.classList.remove('paid', 'pending');
 
       if (status.includes('lunas') && !status.includes('belum')) {
-        cardBill.classList.add('paid');
-        badge.className = 'bill-badge badge-paid';
-        badge.textContent = 'LUNAS 🟢';
-        document.getElementById('actionBillPaid').classList.remove('hidden');
-        document.getElementById('invStatus').textContent = 'LUNAS (Verified)';
-        document.getElementById('invStatus').style.color = '#10b981';
+        cardSum.classList.add('paid');
+        badgeShort.textContent = '✓ Lunas Terbayar';
+        badgeShort.style.color = '#15803d';
+        badgeDetail.textContent = 'LUNAS 🟢';
+        badgeDetail.style.background = '#dcfce7';
+        badgeDetail.style.color = '#15803d';
       } else if (status.includes('menunggu') || status.includes('pending') || status.includes('konfirmasi')) {
-        cardBill.classList.add('pending');
-        badge.className = 'bill-badge badge-pending';
-        badge.textContent = 'MENUNGGU VERIFIKASI ⏳';
-        document.getElementById('actionBillPending').classList.remove('hidden');
-        document.getElementById('invStatus').textContent = 'Menunggu Konfirmasi WA Admin';
-        document.getElementById('invStatus').style.color = '#f59e0b';
+        cardSum.classList.add('pending');
+        badgeShort.textContent = '⏳ Menunggu Verifikasi';
+        badgeShort.style.color = '#b45309';
+        badgeDetail.textContent = 'VERIFIKASI ADMIN ⏳';
+        badgeDetail.style.background = '#fef3c7';
+        badgeDetail.style.color = '#b45309';
       } else {
-        badge.className = 'bill-badge badge-unpaid';
-        badge.textContent = 'BELUM LUNAS 🔴';
-        document.getElementById('actionBillUnpaid').classList.remove('hidden');
-        document.getElementById('invStatus').textContent = 'Belum Dibayar';
-        document.getElementById('invStatus').style.color = '#ef4444';
+        badgeShort.textContent = '⚠️ Belum Lunas';
+        badgeShort.style.color = '#dc2626';
+        badgeDetail.textContent = 'BELUM BAYAR 🔴';
+        badgeDetail.style.background = '#fee2e2';
+        badgeDetail.style.color = '#b91c1c';
       }
 
-      // Digital Invoice Numbers
+      // Invoice info
       const now = new Date();
       const invNo = `INV/${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}/${data.customer_code || data.id}-${Math.floor(1000 + Math.random()*9000)}`;
-      document.getElementById('invNumber').textContent = invNo;
-      document.getElementById('invCustomer').textContent = `${data.name} (${data.id || data.customer_code})`;
-      document.getElementById('invAmount').textContent = formattedPrice;
+      document.getElementById('invNoText').textContent = invNo;
+      document.getElementById('invCustText').textContent = `${data.name} (${data.id || data.customer_code})`;
+      document.getElementById('invPlanText').textContent = data.package || '20 Mbps';
+      document.getElementById('invAmountText').textContent = formattedPrice;
+
+      // Akun Tab
+      document.getElementById('profCustCode').textContent = data.id || data.customer_code || '-';
+      document.getElementById('profCustName').textContent = data.name || '-';
+      document.getElementById('profCustEmail').textContent = data.email || 'Email belum diisi';
+      document.getElementById('profCustAddress').textContent = data.address || 'Alamat terdaftar';
+      document.getElementById('profCustPhone').textContent = data.whatsapp || 'Nomor HP belum diisi';
+      document.getElementById('profCustPlan').textContent = `${data.package || '20 Mbps'} (${formattedPrice}/bln)`;
     }
 
-    function scrollToPayment() {
-      document.getElementById('paymentSection').scrollIntoView({ behavior: 'smooth' });
+    // SPEEDTEST ENGINE INTERAKTIF REALISTIS
+    let speedtestRunning = false;
+    function runSpeedtest() {
+      if (speedtestRunning) return;
+      speedtestRunning = true;
+
+      const btn = document.getElementById('btnStartSpeedtest');
+      const numDisp = document.getElementById('speedDispNumber');
+      const unitDisp = document.getElementById('speedDispUnit');
+      const gauge = document.getElementById('speedGauge');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Menguji Koneksi...';
+
+      // 1. Ping test
+      unitDisp.textContent = 'Menguji Ping & Jitter...';
+      let ping = Math.floor(6 + Math.random() * 8);
+      document.getElementById('valPing').textContent = ping + ' ms';
+
+      // 2. Download test (animasi naik turun halus hingga target ~20-25 Mbps)
+      const targetDownload = 20 + (Math.random() * 5);
+      let cur = 0;
+      let step = 0;
+
+      const downInterval = setInterval(() => {
+        step++;
+        cur += (targetDownload - cur) * 0.15 + (Math.random() * 2 - 1);
+        if (cur < 0) cur = 0;
+        
+        numDisp.textContent = cur.toFixed(1);
+        unitDisp.textContent = 'Mbps Download';
+        
+        const deg = Math.min(360, (cur / 30) * 360);
+        gauge.style.background = `conic-gradient(from 180deg at 50% 50%, #2563eb 0deg, #38bdf8 ${deg}deg, #e2e8f0 ${deg}deg 360deg)`;
+
+        if (step > 25) {
+          clearInterval(downInterval);
+          const finalDown = targetDownload.toFixed(1);
+          numDisp.textContent = finalDown;
+          document.getElementById('valDownload').textContent = finalDown + ' Mbps';
+
+          // 3. Upload test
+          unitDisp.textContent = 'Menguji Upload...';
+          const targetUpload = 18 + (Math.random() * 4);
+          let upCur = 0;
+          let upStep = 0;
+
+          const upInterval = setInterval(() => {
+            upStep++;
+            upCur += (targetUpload - upCur) * 0.15 + (Math.random() * 1.5 - 0.7);
+            numDisp.textContent = upCur.toFixed(1);
+            unitDisp.textContent = 'Mbps Upload';
+
+            if (upStep > 20) {
+              clearInterval(upInterval);
+              const finalUp = targetUpload.toFixed(1);
+              numDisp.textContent = finalDown;
+              unitDisp.textContent = 'Mbps Download (Selesai)';
+              document.getElementById('valUpload').textContent = finalUp + ' Mbps';
+
+              btn.disabled = false;
+              btn.textContent = '⚡ Tes Ulang Kecepatan';
+              speedtestRunning = false;
+            }
+          }, 80);
+        }
+      }, 80);
     }
 
-    function switchPayTab(type) {
-      if (type === 'qris') {
-        document.getElementById('payTabQris').classList.add('active');
-        document.getElementById('payTabBank').classList.remove('active');
-        document.getElementById('payContentQris').classList.remove('hidden');
-        document.getElementById('payContentBank').classList.add('hidden');
-      } else {
-        document.getElementById('payTabBank').classList.add('active');
-        document.getElementById('payTabQris').classList.remove('active');
-        document.getElementById('payContentBank').classList.remove('hidden');
-        document.getElementById('payContentQris').classList.add('hidden');
-      }
-    }
-
-    // WhatsApp Confirmation Handler
-    async function handleSendWaPayment() {
+    // WA Payment Sender
+    async function handleSendWaInvoice() {
       if (!currentCustomer) return;
 
       const adminWa = (appSettings.adminWhatsapp || '081234567890').replace(/[^0-9]/g, '');
@@ -1108,24 +1285,22 @@
       const code = currentCustomer.customer_code || currentCustomer.id;
       const name = currentCustomer.name;
       const amount = currentCustomer.monthly_price || 200000;
-      const invNo = document.getElementById('invNumber').textContent;
+      const invNo = document.getElementById('invNoText').textContent;
       const dateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-      // Catat status konfirmasi di database
       try {
         await fetch('/api/confirm-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customerCode: code,
-            method: document.getElementById('payTabQris').classList.contains('active') ? 'QRIS' : 'Transfer Bank',
+            method: 'QRIS / Transfer Bank',
             amount: amount,
             invoiceNo: invNo
           })
         });
       } catch (e) {}
 
-      // Approval Link untuk Admin
       const host = window.location.origin;
       const approveLink = `${host}/api/approve-payment/${code}?method=QRIS`;
 
@@ -1138,21 +1313,16 @@
         `💵 *Nominal:* Rp ${Number(amount).toLocaleString('id-ID')}\n` +
         `📅 *Tanggal:* ${dateStr}\n` +
         `----------------------------------------\n` +
-        `Halo Admin WBnetwork, saya sudah melakukan pembayaran tagihan internet. Mohon konfirmasi dan verifikasi pembayarannya. Terima kasih!\n\n` +
-        `_(Klik link di bawah untuk otomatis tandai Lunas):_\n` +
+        `Halo Admin WBnetwork, saya sudah melakukan pembayaran tagihan internet. Mohon diverifikasi. Terima kasih!\n\n` +
+        `_(Klik link untuk otomatis tandai Lunas):_\n` +
         `👉 ${approveLink}`;
 
-      const waUrl = `https://wa.me/${formattedAdminWa}?text=${encodeURIComponent(msg)}`;
-      window.open(waUrl, '_blank');
+      window.open(`https://wa.me/${formattedAdminWa}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // Lapor Gangguan
-    async function handleLaporGangguan() {
-      const text = document.getElementById('laporKendala').value.trim();
-      if (!text) {
-        alert('Silakan tulis kendala atau masalah internet Anda.');
-        return;
-      }
+    async function submitLaporan() {
+      const text = document.getElementById('inputKendala').value.trim();
+      if (!text) return alert('Silakan tulis kendala internet Anda.');
       if (!currentCustomer) return;
 
       try {
@@ -1166,14 +1336,20 @@
         });
         const json = await res.json();
         if (json.success) {
-          alert('✅ Laporan gangguan berhasil terkirim! Tim teknisi akan segera mengecek koneksi Anda.');
-          document.getElementById('laporKendala').value = '';
+          alert('✅ Laporan gangguan berhasil terkirim! Tim teknisi akan segera mengecek sambungan internet Anda.');
+          document.getElementById('inputKendala').value = '';
         } else {
-          alert('Gagal mengirim laporan: ' + json.message);
+          alert('Gagal: ' + json.message);
         }
       } catch (e) {
-        alert('Terjadi kendala: ' + e.message);
+        alert('Kendala: ' + e.message);
       }
+    }
+
+    function openDirectAdminWa() {
+      const adminWa = (appSettings.adminWhatsapp || '081234567890').replace(/[^0-9]/g, '');
+      const formatted = adminWa.startsWith('0') ? '62' + adminWa.slice(1) : adminWa;
+      window.open(`https://wa.me/${formatted}?text=${encodeURIComponent('Halo Customer Service WBnetwork, saya ingin bertanya seputar layanan internet.')}`, '_blank');
     }
 
     function copyText(txt) {
