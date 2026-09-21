@@ -559,7 +559,8 @@
       </div>
 
       <!-- Banner Download APK di Halaman Login -->
-      <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--border);text-align:center">
+      <div id="loginApkBanner" style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--border);text-align:center;position:relative">
+        <button onclick="dismissApkBanner(event)" title="Tutup" style="position:absolute;top:10px;right:0;background:#f1f5f9;border:none;color:var(--muted);cursor:pointer;font-size:12px;width:22px;height:22px;border-radius:50%;font-weight:800;display:flex;align-items:center;justify-content:center">✕</button>
         <div style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">
           📲 Unduh Aplikasi Android (APK)
         </div>
@@ -637,8 +638,10 @@
         </div>
 
         <!-- Smart PWA / APK Install Banner -->
-        <div id="pwaInstallBanner" class="card" style="background:linear-gradient(135deg, #1e293b, #0f172a);color:white;border:none;margin-bottom:14px;padding:16px;border-radius:18px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+        <div id="pwaInstallBanner" class="card" style="background:linear-gradient(135deg, #1e293b, #0f172a);color:white;border:none;margin-bottom:14px;padding:16px;border-radius:18px;position:relative">
+          <button onclick="dismissApkBanner(event)" title="Tutup / Jangan tampilkan lagi" style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,0.15);border:none;color:white;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700">✕</button>
+          
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding-right:24px">
             <div style="display:flex;align-items:center;gap:12px">
               <img src="/icon.svg" style="width:40px;height:40px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.3);flex-shrink:0">
               <div>
@@ -805,12 +808,17 @@
           </div>
 
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
-            <a href="https://www.mediafire.com/file/m8a4g1l0v1pxazk/wbnetwork.apk/file" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px">
-              📥 Unduh Aplikasi Android (MediaFire)
-            </a>
-            <button class="btn btn-outline" style="font-size:12px;padding:8px" onclick="triggerPwaInstall()">
-              📲 Pasang Pintasan di Layar HP (PWA)
-            </button>
+            <div id="accountAppDownloadWrap" style="display:flex;flex-direction:column;gap:8px">
+              <a href="https://www.mediafire.com/file/m8a4g1l0v1pxazk/wbnetwork.apk/file" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px">
+                📥 Unduh Aplikasi Android (MediaFire)
+              </a>
+              <button class="btn btn-outline" style="font-size:12px;padding:8px" onclick="triggerPwaInstall()">
+                📲 Pasang Pintasan di Layar HP (PWA)
+              </button>
+            </div>
+            <div id="accountAppVersionBadge" class="hidden" style="text-align:center;padding:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;color:#166534;font-size:12px;font-weight:700">
+              🤖 Aplikasi Android WBnetwork v1.0 (Aktif 🟢)
+            </div>
             <button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="handleLogout()">
               🚪 Keluar dari Akun Ini
             </button>
@@ -913,12 +921,40 @@
       });
     }
 
+    function isRunningInApp() {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || document.referrer.includes('android-app://');
+      const isWebView = /(wv|WebView|WebIntoApp|Version\/[0-9\.]+ Chrome\/[0-9\.]+ Mobile)/i.test(navigator.userAgent) || window.location.search.includes('source=app');
+      const isDismissed = localStorage.getItem('hide_apk_banner') === 'true';
+      return isStandalone || isWebView || isDismissed;
+    }
+
+    function checkAndHideAppBanners() {
+      if (isRunningInApp()) {
+        const pwaBanner = document.getElementById('pwaInstallBanner');
+        if (pwaBanner) pwaBanner.style.display = 'none';
+        const loginApkBanner = document.getElementById('loginApkBanner');
+        if (loginApkBanner) loginApkBanner.style.display = 'none';
+        const accountAppDownloadWrap = document.getElementById('accountAppDownloadWrap');
+        if (accountAppDownloadWrap) accountAppDownloadWrap.style.display = 'none';
+        const accountAppVersionBadge = document.getElementById('accountAppVersionBadge');
+        if (accountAppVersionBadge) accountAppVersionBadge.classList.remove('hidden');
+      }
+    }
+
+    window.dismissApkBanner = function(e) {
+      if (e) e.stopPropagation();
+      localStorage.setItem('hide_apk_banner', 'true');
+      checkAndHideAppBanners();
+    };
+
     // Capture Native PWA Install Prompt (Android/Chrome)
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPwaPrompt = e;
-      const banner = document.getElementById('pwaInstallBanner');
-      if (banner) banner.classList.remove('hidden');
+      if (!isRunningInApp()) {
+        const banner = document.getElementById('pwaInstallBanner');
+        if (banner) banner.style.display = 'block';
+      }
     });
 
     window.triggerPwaInstall = function() {
@@ -926,7 +962,8 @@
         deferredPwaPrompt.prompt();
         deferredPwaPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
-            console.log('PWA installed');
+            localStorage.setItem('hide_apk_banner', 'true');
+            checkAndHideAppBanners();
           }
           deferredPwaPrompt = null;
         });
@@ -944,6 +981,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      checkAndHideAppBanners();
       await loadAppSettings();
       await checkExistingSession();
     });
