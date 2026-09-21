@@ -303,14 +303,18 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: `Endpoint ${req.originalUrl} tidak ditemukan` });
 });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server aktif di http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server aktif di http://localhost:${PORT}`);
+  });
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} sudah dipakai! Silakan matikan proses node lain dulu.`);
-  } else {
-    console.error(`❌ Server Error:`, err.message);
-  }
-});
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${PORT} sudah dipakai! Silakan matikan proses node lain dulu.`);
+    } else {
+      console.error(`❌ Server Error:`, err.message);
+    }
+  });
+}
+
+module.exports = app;
