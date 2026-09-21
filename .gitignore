@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
+dist/
+build/
+*.logsettings.json
+settings.json
+payment_methods.json
+_archived_mikrotik/
+cloudflared.exe

@@ -1,0 +1,26 @@
+{
+  "name": "WBnetwork — Portal Pelanggan",
+  "short_name": "WBnetwork",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait-primary",
+  "description": "Portal Resmi Layanan Internet, Tagihan & Laporan Gangguan WBnetwork Fiber Optic",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity", "business"]
+}

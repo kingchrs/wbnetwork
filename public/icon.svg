@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="106" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4" />
+
+  <!-- Outer Pulse Ring -->
+  <circle cx="256" cy="220" r="140" fill="none" stroke="url(#blueGrad)" stroke-width="6" opacity="0.3" stroke-dasharray="16 10" />
+  
+  <!-- Glowing Globe Core -->
+  <circle cx="256" cy="220" r="105" fill="none" stroke="url(#blueGrad)" stroke-width="12" filter="url(#glow)" />
+  
+  <!-- Globe Meridians & Parallels -->
+  <ellipse cx="256" cy="220" rx="55" ry="105" fill="none" stroke="#60a5fa" stroke-width="8" opacity="0.85" />
+  <ellipse cx="256" cy="220" rx="105" ry="38" fill="none" stroke="#60a5fa" stroke-width="8" opacity="0.85" />
+  <line x1="256" y1="115" x2="256" y2="325" stroke="#38bdf8" stroke-width="8" opacity="0.9" />
+  <line x1="151" y1="220" x2="361" y2="220" stroke="#38bdf8" stroke-width="8" opacity="0.9" />
+
+  <!-- Fiber Signal Nodes -->
+  <circle cx="256" cy="220" r="18" fill="#38bdf8" filter="url(#glow)" />
+  <circle cx="256" cy="220" r="8" fill="#ffffff" />
+
+  <!-- Speed Lightning Indicator -->
+  <path d="M295 140 L260 210 L285 210 L245 285 L255 225 L230 225 Z" fill="#fbbf24" opacity="0.95" filter="url(#glow)" />
+
+  <!-- WBnetwork Brand Text -->
+  <text x="256" y="415" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1">WBnetwork</text>
+  <text x="256" y="450" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#60a5fa" text-anchor="middle" letter-spacing="3">FIBER PORTAL</text>
+</svg>

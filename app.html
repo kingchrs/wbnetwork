@@ -1,0 +1,1718 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>WBnetwork — Admin Panel RT/RW Net</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* Top Navigation */
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .top-container {
+      max-width: 1300px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .brand-title { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand-sub { font-size: 11px; color: #94a3b8; }
+    
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* Main Container */
+    .container {
+      max-width: 1300px;
+      margin: auto;
+      padding: 20px 16px;
+    }
+
+    /* Notification Banner */
+    .alert-banner {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
+    .alert-banner.has-items {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
+    /* Stat Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .stat-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-val { font-size: 24px; font-weight: 800; margin: 4px 0 2px; color: var(--text); }
+    .stat-desc { font-size: 12px; color: var(--muted); }
+
+    /* Toolbar (Search & Filter) */
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+    }
+    .search-input {
+      flex: 1;
+      min-width: 260px;
+      padding: 11px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: #f1f5f9;
+      color: var(--muted);
+      border: none;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    .tab-btn.tab-pending {
+      background: #fef2f2;
+      color: #ef4444;
+      border: 1px solid #fecaca;
+    }
+    .tab-btn.tab-pending.active {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-edit { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 800; }
+    .btn-edit:hover { background: #dbeafe; }
+    .btn-danger { background: var(--danger-light); color: var(--danger); border: 1px solid #fecaca; }
+    .btn-wa { background: #25d366; color: white; }
+
+    /* Customer Table / List */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 16px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13.5px;
+      vertical-align: middle;
+    }
+    tr:hover td { background: #fbfcfe; }
+
+    .cust-code { font-weight: 800; color: var(--primary); font-size: 13px; }
+    .cust-name { font-size: 15px; font-weight: 800; color: var(--text); }
+    .cust-info-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #334155;
+    }
+    .cust-meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .cust-meta-icon { font-size: 13px; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .badge-paid { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .badge-unpaid { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .badge-pending { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; }
+
+    /* Action Buttons in Row */
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-card {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 18px; font-weight: 800; color: #0f172a; }
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 16px 0 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #eff6ff;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Method Items */
+    .method-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Detail Card */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .detail-item {
+      background: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .detail-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .detail-val { font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 2px; }
+
+    /* QRIS Master Box */
+    .qris-master-box {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .qris-preview-img {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #bbf7d0;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 768px) {
+      .table-wrap { background: transparent; border: none; box-shadow: none; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: var(--shadow);
+      }
+      td {
+        padding: 8px 0;
+        border: none;
+      }
+      .row-actions { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+      .qris-master-box { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="top-container">
+      <div class="brand">
+        <div class="brand-logo">⚡</div>
+        <div>
+          <div class="brand-title">WBnetwork Admin</div>
+          <div class="brand-sub">Manajemen Data Diri Pelanggan, Tagihan & Rekening Pembayaran</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <!-- TOMBOL KHUSUS NOMOR WA ADMIN -->
+        <button id="btnOpenWaModal" class="btn btn-wa" style="font-weight:800;padding:8px 14px;box-shadow:0 2px 8px rgba(37,211,102,0.3)">
+          📱 WA Admin: <span id="headerAdminWa">081234567890</span> ✏️
+        </button>
+        <button id="btnOpenBankModal" class="btn btn-outline" style="color:white;border-color:#334155;background:#1e293b">
+          🏦 Atur QRIS & Rekening
+        </button>
+        <button id="btnOpenMassPrice" class="btn btn-outline" style="color:white;border-color:#334155;background:#1e293b">
+          📈 Tarif Massal
+        </button>
+        <button id="btnOpenAddModal" class="btn btn-primary">
+          + Daftarkan Pelanggan Baru
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Notifikasi Konfirmasi Masuk -->
+    <div id="bannerPendingConfirm" class="alert-banner hidden">
+      <div>
+        <span style="font-weight:800;color:#991b1b">🔔 Ada Konfirmasi Pembayaran / Laporan Baru!</span>
+        <div style="font-size:12px;color:#7f1d1d">Pelanggan telah mengirim konfirmasi bayar yang memerlukan verifikasi admin.</div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btnViewPendingList">
+        Lihat & Setujui Sekarang
+      </button>
+    </div>
+
+    <!-- Ringkasan Statistik -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">👥 Total Pelanggan</div>
+        <div class="stat-val" id="statTotalCust">0</div>
+        <div class="stat-desc">Pelanggan resmi terdaftar</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">💰 Potensi Omzet Bulanan</div>
+        <div class="stat-val" id="statTotalOmzet">Rp 0</div>
+        <div class="stat-desc">Total tagihan seluruh paket</div>
+      </div>
+      <div class="stat-card" style="border-color:#86efac">
+        <div class="stat-label" style="color:#059669">✓ Sudah Lunas Bulan Ini</div>
+        <div class="stat-val" id="statPaidTotal" style="color:#059669">Rp 0</div>
+        <div class="stat-desc" id="statPaidCount">0 Pelanggan</div>
+      </div>
+      <div class="stat-card" style="border-color:#fde68a">
+        <div class="stat-label" style="color:#d97706">⏳ Belum Bayar</div>
+        <div class="stat-val" id="statUnpaidTotal" style="color:#d97706">Rp 0</div>
+        <div class="stat-desc" id="statUnpaidCount">0 Pelanggan</div>
+      </div>
+    </div>
+
+    <!-- Toolbar Pencarian & Filter -->
+    <div class="toolbar">
+      <input type="text" id="inputSearch" class="search-input" placeholder="🔍 Cari nama, ID (WB0004), nomor HP/WA, alamat, atau patokan rumah...">
+      
+      <div class="filter-tabs" id="filterStatusTabs">
+        <button class="tab-btn active" data-filter="all">Semua (<span id="countAll">0</span>)</button>
+        <button class="tab-btn tab-pending" data-filter="pending">🔔 Konfirmasi (<span id="countPending">0</span>)</button>
+        <button class="tab-btn" data-filter="unpaid">Belum Bayar (<span id="countUnpaid">0</span>)</button>
+        <button class="tab-btn" data-filter="paid">Lunas (<span id="countPaid">0</span>)</button>
+      </div>
+    </div>
+
+    <!-- Tabel Pelanggan & Data Diri -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data Diri & Kontak Pelanggan</th>
+            <th>Paket & Tarif Bulanan</th>
+            <th>Jatuh Tempo</th>
+            <th>Status Pembayaran</th>
+            <th style="text-align:right">Kelola Data Diri & Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="custTableBody">
+          <tr>
+            <td colspan="5" style="text-align:center;padding:40px;color:var(--muted)">
+              ⏳ Memuat data pelanggan dari Supabase...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- MODAL EDIT DATA DIRI & TAGIHAN PELANGGAN -->
+  <div id="modalEdit" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">✏️ Edit Data Diri & Tagihan Pelanggan</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseEdit">✕</button>
+      </div>
+
+      <input type="hidden" id="editCustCode">
+
+      <!-- Section 1: Data Diri Pelanggan -->
+      <div class="form-section-title">1. Identitas & Kontak Pelanggan</div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">ID Pelanggan (Resmi)</label>
+          <input type="text" id="dispEditCustCode" class="form-input" disabled style="background:#f1f5f9;font-weight:800;color:var(--primary)">
+        </div>
+        <div>
+          <label class="form-label">Nama Lengkap Pelanggan *</label>
+          <input type="text" id="editName" class="form-input" placeholder="Nama Lengkap">
+        </div>
+      </div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Nomor WhatsApp / HP *</label>
+          <input type="text" id="editWhatsapp" class="form-input" placeholder="0812...">
+        </div>
+        <div>
+          <label class="form-label">Nomor KTP / NIK (Opsional)</label>
+          <input type="text" id="editNik" class="form-input" placeholder="3201...">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Alamat Lengkap Rumah *</label>
+        <textarea id="editAddress" class="form-input" rows="2" placeholder="Kampung / Jalan, RT, RW, Desa..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Catatan Lokasi / Patokan Rumah</label>
+        <input type="text" id="editLocationNote" class="form-input" placeholder="Contoh: Depan masjid, rumah cat hijau...">
+      </div>
+
+      <!-- Section 2: Paket & Tagihan -->
+      <div class="form-section-title">2. Paket & Penyesuaian Tagihan</div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Paket Internet</label>
+          <input type="text" id="editPackageName" class="form-input" placeholder="Contoh: 20 Mbps">
+        </div>
+        <div>
+          <label class="form-label" style="color:var(--primary)">Harga Bulanan (Rp) (Bisa Naik/Turun)</label>
+          <input type="number" id="editMonthlyPrice" class="form-input" style="font-weight:800;color:var(--primary)" placeholder="200000">
+        </div>
+      </div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Tanggal Jatuh Tempo (Tgl)</label>
+          <input type="number" id="editDueDay" class="form-input" placeholder="Contoh: 10">
+        </div>
+        <div>
+          <label class="form-label">Status Pelanggan</label>
+          <select id="editCustomerStatus" class="form-input">
+            <option value="aktif">Aktif</option>
+            <option value="isolir">Isolir / Non-Aktif</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="editSaveMsg" style="font-size:13px;font-weight:700;margin-top:10px"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelEdit">Batal</button>
+        <button class="btn btn-primary" id="btnSaveEdit">💾 Simpan Semua Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL LENGKAP PELANGGAN -->
+  <div id="modalDetail" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">👁️ Profil Lengkap Pelanggan</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseDetail">✕</button>
+      </div>
+
+      <div style="background:#eff6ff;padding:16px;border-radius:14px;border:1px solid #bfdbfe;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--primary)" id="detCustCode">WB0004</div>
+          <div style="font-size:18px;font-weight:800;color:#1e3a8a" id="detCustName">Nama</div>
+        </div>
+        <span id="detCustBadge" class="badge badge-paid">Lunas</span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Nomor WhatsApp / HP</div>
+          <div class="detail-val" id="detWhatsapp">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Nomor KTP / NIK</div>
+          <div class="detail-val" id="detNik">-</div>
+        </div>
+        <div class="detail-item" style="grid-column: span 2">
+          <div class="detail-label">Alamat Lengkap</div>
+          <div class="detail-val" id="detAddress">-</div>
+        </div>
+        <div class="detail-item" style="grid-column: span 2">
+          <div class="detail-label">Catatan Lokasi / Patokan</div>
+          <div class="detail-val" id="detLocationNote">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Paket Internet</div>
+          <div class="detail-val" id="detPackageName">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Harga Bulanan</div>
+          <div class="detail-val" style="color:var(--primary)" id="detMonthlyPrice">-</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Jatuh Tempo</div>
+          <div class="detail-val" id="detDueDay">Tgl 10 / bln</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Status Koneksi</div>
+          <div class="detail-val" style="color:#059669">🟢 Aktif & Terhubung</div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="justify-content:space-between">
+        <button class="btn btn-danger btn-sm" id="btnDeleteCustomer">
+          🗑️ Hapus Pelanggan Ini
+        </button>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" id="btnEditFromDetail">
+            ✏️ Edit Data Ini
+          </button>
+          <button class="btn btn-outline btn-sm" id="btnCloseDetailFoot">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DAFTARKAN PELANGGAN BARU (MENDAPATKAN ID PELANGGAN) -->
+  <div id="modalAdd" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">+ Daftarkan Pelanggan Baru</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseAdd">✕</button>
+      </div>
+
+      <div class="form-section-title">1. Data Diri & Kontak</div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label" style="color:var(--primary)">ID Pelanggan (Otomatis)</label>
+          <input type="text" id="addCustCode" class="form-input" style="font-weight:800;color:var(--primary)">
+        </div>
+        <div>
+          <label class="form-label">Nama Lengkap Pelanggan *</label>
+          <input type="text" id="addName" class="form-input" placeholder="Contoh: Budi Santoso">
+        </div>
+      </div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Nomor WhatsApp / HP *</label>
+          <input type="text" id="addWhatsapp" class="form-input" placeholder="0812...">
+        </div>
+        <div>
+          <label class="form-label">Nomor KTP / NIK (Opsional)</label>
+          <input type="text" id="addNik" class="form-input" placeholder="3201...">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Alamat Lengkap Rumah *</label>
+        <textarea id="addAddress" class="form-input" rows="2" placeholder="Kampung / RT RW / Desa..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Catatan Lokasi / Patokan Rumah</label>
+        <input type="text" id="addLocationNote" class="form-input" placeholder="Contoh: Samping warung, rumah pagar biru...">
+      </div>
+
+      <div class="form-section-title">2. Paket Internet & Tarif</div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Pilih Paket Internet</label>
+          <select id="addPackagePreset" class="form-input" onchange="window.onAddPresetChange()">
+            <option value="7 Mbps|120000">7 Mbps (Rp 120.000)</option>
+            <option value="10 Mbps|165000">10 Mbps (Rp 165.000)</option>
+            <option value="15 Mbps|180000">15 Mbps (Rp 180.000)</option>
+            <option value="20 Mbps|200000" selected>20 Mbps (Rp 200.000)</option>
+            <option value="30 Mbps|250000">30 Mbps (Rp 250.000)</option>
+            <option value="50 Mbps|350000">50 Mbps (Rp 350.000)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Tarif Bulanan (Rp)</label>
+          <input type="number" id="addMonthlyPrice" class="form-input" value="200000">
+        </div>
+      </div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Jatuh Tempo (Tgl)</label>
+          <input type="number" id="addDueDay" class="form-input" value="10">
+        </div>
+      </div>
+
+      <div id="addSaveMsg" style="font-size:13px;font-weight:700;margin-top:10px"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelAdd">Batal</button>
+        <button class="btn btn-primary" id="btnSaveAdd">✓ Daftarkan & Buat Akun</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SUKSES PENDAFTARAN -->
+  <div id="modalSuccessAdd" class="modal-backdrop hidden">
+    <div class="modal-card" style="text-align:center">
+      <div style="font-size:48px;margin-bottom:10px">🎉</div>
+      <div class="modal-title" style="font-size:19px;margin-bottom:6px">Pelanggan Berhasil Didaftarkan!</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+        Pelanggan telah mendapatkan ID resmi dan dapat login ke aplikasi dari HP mereka.
+      </p>
+
+      <div style="background:#eff6ff;padding:16px;border-radius:14px;margin-bottom:16px;text-align:left">
+        <div style="font-size:12px;color:var(--primary);font-weight:700">ID PELANGGAN RESMI:</div>
+        <div id="succCustCode" style="font-size:22px;font-weight:800;color:#1e3a8a">-</div>
+        <div id="succCustName" style="font-size:14px;font-weight:700;color:#0f172a;margin-top:4px">-</div>
+        <div id="succCustPlan" style="font-size:13px;color:var(--muted)">-</div>
+      </div>
+
+      <button id="btnShareNewCustWA" class="btn btn-wa" style="width:100%;margin-bottom:8px">
+        📲 Kirim ID Pelanggan & Link Web via WhatsApp
+      </button>
+      <button id="btnCloseSuccessAdd" class="btn btn-outline" style="width:100%">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL KHUSUS PENGATURAN NOMOR WHATSAPP ADMIN -->
+  <div id="modalAdminWa" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">📱 Atur Nomor WhatsApp Admin</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseWaModal">✕</button>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        Nomor WhatsApp ini digunakan untuk <b>menerima invoice pembayaran otomatis, bukti transfer, dan laporan gangguan</b> dari semua pelanggan.
+      </p>
+
+      <div class="form-group" style="background:#f0fdf4;padding:16px;border-radius:14px;border:1px solid #bbf7d0">
+        <label class="form-label" style="color:#166534;font-size:13px">Nomor WhatsApp Admin (Aktif) *</label>
+        <input type="text" id="dedicatedAdminWaInput" class="form-input" placeholder="Contoh: 081234567890" style="font-size:16px;font-weight:800;color:#166534">
+        <div style="font-size:12px;color:#15803d;margin-top:6px">
+          💡 Format boleh diawali <b>08...</b> atau <b>628...</b>.
+        </div>
+      </div>
+
+      <div id="saveWaMsg" style="font-size:13px;font-weight:700;margin-top:10px"></div>
+
+      <div class="modal-actions" style="justify-content:space-between">
+        <button class="btn btn-wa btn-sm" id="btnTestAdminWa">
+          📲 Tes Kirim WA
+        </button>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline" id="btnCancelWaModal">Batal</button>
+          <button class="btn btn-primary" id="btnSaveDedicatedWa">💾 Simpan Nomor WA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PENGATURAN MASTER QRIS & REKENING BANK -->
+  <div id="modalBankSettings" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">🏦 Atur QRIS, Rekening & Nomor WA Admin</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseBankModal">✕</button>
+      </div>
+
+      <!-- 0. NOMOR WHATSAPP ADMIN (UNTUK MENERIMA INVOICE & BUKTI BAYAR) -->
+      <div class="form-section-title" style="color:#25d366">0. Nomor WhatsApp Admin (Penerima Bukti & Invoice)</div>
+      <div class="form-group" style="background:#f0fdf4;padding:12px 14px;border-radius:12px;border:1px solid #bbf7d0">
+        <label class="form-label" style="color:#166534">Nomor WhatsApp Admin (Aktif) *</label>
+        <input type="text" id="inputAdminWa" class="form-input" placeholder="Contoh: 081234567890" style="font-weight:800;color:#166534">
+        <div style="font-size:11.5px;color:#15803d;margin-top:4px">
+          Setiap pelanggan yang mengonfirmasi pembayaran akan otomatis mengirim invoice ke nomor WA ini.
+        </div>
+      </div>
+
+      <!-- 1. MASTER QRIS BOX (UNTUK SEMUA PELANGGAN) -->
+      <div class="form-section-title">1. QRIS Barcode Utama (Untuk Semua Pelanggan)</div>
+      
+      <div class="qris-master-box">
+        <img id="qrisMasterPreview" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WBnetwork-Pembayaran-Resmi" class="qris-preview-img" alt="QRIS Preview">
+        <div style="flex:1;text-align:left">
+          <div style="font-size:14px;font-weight:800;color:#065f46" id="dispQrisMerchantName">WBnetwork Official QRIS</div>
+          <div style="font-size:12px;color:#047857" id="dispQrisNmid">NMID: ID1020304050</div>
+          <div style="font-size:11.5px;color:#64748b;margin:6px 0 10px">Scan otomatis menggunakan BCA, Mandiri, BRI, DANA, GoPay, OVO, ShopeePay dll.</div>
+          
+          <label class="btn btn-success btn-sm" style="cursor:pointer;display:inline-flex">
+            📷 Upload Foto / Gambar QRIS
+            <input type="file" id="inputQrisFile" accept="image/*" style="display:none">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">Nama Merchant QRIS</label>
+          <input type="text" id="inputQrisMerchant" class="form-input" placeholder="WBnetwork Official">
+        </div>
+        <div>
+          <label class="form-label">NMID / Keterangan QRIS</label>
+          <input type="text" id="inputQrisNmid" class="form-input" placeholder="ID1020304050">
+        </div>
+      </div>
+
+      <!-- 2. DAFTAR REKENING BANK & E-WALLET -->
+      <div class="form-section-title">2. Daftar Rekening Bank & E-Wallet</div>
+      <div id="bankMethodsList"></div>
+
+      <!-- Tambah Rekening Baru -->
+      <div style="background:#f8fafc;padding:14px;border-radius:14px;border:1px solid var(--border);margin-top:14px">
+        <div style="font-size:13px;font-weight:800;margin-bottom:10px">+ Tambah Rekening / E-Wallet Baru:</div>
+        
+        <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label class="form-label">Tipe</label>
+            <select id="newMethodType" class="form-input">
+              <option value="bank">Bank Transfer (BCA, BRI, Mandiri, dll)</option>
+              <option value="ewallet">E-Wallet (DANA, Gopay, OVO, ShopeePay)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Nama Bank / Dompet</label>
+            <input type="text" id="newMethodName" class="form-input" placeholder="Contoh: BANK BCA">
+          </div>
+        </div>
+
+        <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label class="form-label">Nomor Rekening / No HP</label>
+            <input type="text" id="newMethodAccNo" class="form-input" placeholder="123-456-7890">
+          </div>
+          <div>
+            <label class="form-label">Atas Nama (Pemilik)</label>
+            <input type="text" id="newMethodHolder" class="form-input" placeholder="a.n. WBnetwork">
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-sm" id="btnAddMethod" style="width:100%">
+          + Tambahkan ke Daftar Rekening
+        </button>
+      </div>
+
+      <div id="bankSaveMsg" style="font-size:13px;font-weight:700;margin-top:10px"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelBankModal">Tutup</button>
+        <button class="btn btn-success" id="btnSaveBankModal">💾 Simpan Semua QRIS & Rekening</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KENAIKAN TARIF MASSAL -->
+  <div id="modalMassPrice" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">📈 Penyesuaian Tarif Paket Massal</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseMassPrice">✕</button>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        Ubah tarif bulanan untuk <b>semua pelanggan</b> yang menggunakan paket tertentu secara serentak.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Pilih Paket Target</label>
+        <select id="massTargetPkg" class="form-input">
+          <option value="7 Mbps">7 Mbps</option>
+          <option value="10 Mbps">10 Mbps</option>
+          <option value="15 Mbps">15 Mbps</option>
+          <option value="20 Mbps">20 Mbps</option>
+          <option value="30 Mbps">30 Mbps</option>
+          <option value="50 Mbps">50 Mbps</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Harga Baru (Rp)</label>
+        <input type="number" id="massNewPrice" class="form-input" placeholder="Contoh: 175000">
+      </div>
+
+      <div id="massPriceMsg" style="font-size:13px;font-weight:700;margin-top:10px"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelMassPrice">Batal</button>
+        <button class="btn btn-primary" id="btnExecuteMassPrice">Terapkan Perubahan Harga</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://dybzflagbpiefmyfmvmh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_V43tiI3gAisprvRSsi3U0g_jz0OTQKB';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let db = [];
+    let paymentMethods = [];
+    let currentFilter = 'all';
+    let selectedDetailCustomer = null;
+    let currentQrisImage = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WBnetwork-Pembayaran-Resmi';
+
+    const $ = id => document.getElementById(id);
+    const esc = str => String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+    // 1. Muat Data Pelanggan & Rekening
+    async function loadCustomers() {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .order('customer_code');
+
+      if (error) {
+        alert('Gagal memuat Supabase: ' + error.message);
+        return;
+      }
+
+      db = data || [];
+      renderStats();
+      renderTable();
+      loadPaymentMethods();
+    }
+
+    async function loadPaymentMethods() {
+      try {
+        const res = await fetch('/api/settings');
+        const json = await res.json();
+        if (json.success && json.data) {
+          const s = json.data;
+          $('inputAdminWa').value = s.adminWhatsapp || '081234567890';
+          paymentMethods = s.paymentMethods || [];
+
+          const qrisItem = paymentMethods.find(m => m.type === 'qris');
+          if (qrisItem) {
+            currentQrisImage = qrisItem.imageUrl || currentQrisImage;
+            $('qrisMasterPreview').src = currentQrisImage;
+            $('dispQrisMerchantName').textContent = qrisItem.name || 'WBnetwork Official QRIS';
+            $('dispQrisNmid').textContent = 'NMID: ' + (qrisItem.accountNumber || 'ID1020304050');
+            $('inputQrisMerchant').value = qrisItem.name || '';
+            $('inputQrisNmid').value = qrisItem.accountNumber || '';
+          }
+        }
+      } catch (err) {
+        console.error("Gagal load settings:", err);
+      }
+    }
+
+    // 2. Statistik & Notifikasi Konfirmasi
+    function renderStats() {
+      const totalCust = db.length;
+      let totalOmzet = 0;
+      let paidTotal = 0;
+      let paidCount = 0;
+      let unpaidTotal = 0;
+      let unpaidCount = 0;
+      let pendingCount = 0;
+
+      db.forEach(c => {
+        const price = Number(c.monthly_price || 0);
+        totalOmzet += price;
+
+        const v = c.visit_checklist || {};
+        if (v.payment_status === 'Lunas') {
+          paidTotal += price;
+          paidCount++;
+        } else if (v.payment_status === 'Menunggu Konfirmasi' || v.pending_approval) {
+          pendingCount++;
+          unpaidTotal += price;
+          unpaidCount++;
+        } else {
+          unpaidTotal += price;
+          unpaidCount++;
+        }
+      });
+
+      $('statTotalCust').textContent = totalCust + ' Pelanggan';
+      $('statTotalOmzet').textContent = 'Rp ' + totalOmzet.toLocaleString('id-ID');
+      $('statPaidTotal').textContent = 'Rp ' + paidTotal.toLocaleString('id-ID');
+      $('statPaidCount').textContent = `${paidCount} Pelanggan Lunas`;
+      $('statUnpaidTotal').textContent = 'Rp ' + unpaidTotal.toLocaleString('id-ID');
+      $('statUnpaidCount').textContent = `${unpaidCount} Pelanggan Belum Bayar`;
+
+      $('countAll').textContent = totalCust;
+      $('countPaid').textContent = paidCount;
+      $('countUnpaid').textContent = unpaidCount;
+      $('countPending').textContent = pendingCount;
+
+      if (pendingCount > 0) {
+        $('bannerPendingConfirm').classList.remove('hidden');
+        $('bannerPendingConfirm').classList.add('has-items');
+      } else {
+        $('bannerPendingConfirm').classList.add('hidden');
+      }
+    }
+
+    // 3. Render Tabel Pelanggan dengan Data Diri Lengkap & Tombol Edit Jelas
+    function renderTable() {
+      const search = ($('inputSearch').value || '').trim().toLowerCase();
+      const tbody = $('custTableBody');
+
+      const filtered = db.filter(c => {
+        const matchSearch = 
+          (c.name && c.name.toLowerCase().includes(search)) ||
+          (c.customer_code && c.customer_code.toLowerCase().includes(search)) ||
+          (c.whatsapp && c.whatsapp.includes(search)) ||
+          (c.address && c.address.toLowerCase().includes(search)) ||
+          (c.location_note && c.location_note.toLowerCase().includes(search)) ||
+          (c.nik && c.nik.includes(search));
+
+        if (!matchSearch) return false;
+
+        const v = c.visit_checklist || {};
+        const isPaid = (v.payment_status === 'Lunas');
+        const isPending = (v.payment_status === 'Menunggu Konfirmasi' || v.pending_approval);
+
+        if (currentFilter === 'paid' && !isPaid) return false;
+        if (currentFilter === 'unpaid' && (isPaid || isPending)) return false;
+        if (currentFilter === 'pending' && !isPending) return false;
+
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center;padding:36px;color:var(--muted)">
+              Tidak ada pelanggan yang cocok dengan pencarian / filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(c => {
+        const v = c.visit_checklist || {};
+        const isPaid = (v.payment_status === 'Lunas');
+        const isPending = (v.payment_status === 'Menunggu Konfirmasi' || v.pending_approval);
+        const price = Number(c.monthly_price || 0);
+
+        let badgeStatus = '';
+        if (isPaid) {
+          badgeStatus = `<span class="badge badge-paid">✓ Lunas (${v.payment_method || 'Kas'})</span>`;
+        } else if (isPending) {
+          badgeStatus = `<span class="badge badge-pending">🔔 Konfirmasi (${v.payment_method || 'Trf'})</span>`;
+        } else {
+          badgeStatus = `<span class="badge badge-unpaid">⏳ Belum Bayar</span>`;
+        }
+
+        const cleanWa = (c.whatsapp || '').replace(/[^0-9]/g, '');
+
+        return `
+          <tr>
+            <!-- Kolom 1: Data Diri Pelanggan Lengkap -->
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="cust-code">${esc(c.customer_code)}</span>
+                <span class="cust-name">${esc(c.name || 'Tanpa Nama')}</span>
+              </div>
+              
+              <div class="cust-info-row">
+                <div class="cust-meta-item">
+                  <span class="cust-meta-icon">📱</span>
+                  <span>${cleanWa ? `<b>${esc(c.whatsapp)}</b> <a href="https://wa.me/${cleanWa.startsWith('0') ? '62'+cleanWa.slice(1) : cleanWa}" target="_blank" style="color:var(--primary);text-decoration:none;font-weight:700;margin-left:4px">[Chat WA]</a>` : '<span style="color:#ef4444">Nomor HP belum diisi</span>'}</span>
+                </div>
+
+                <div class="cust-meta-item">
+                  <span class="cust-meta-icon">📍</span>
+                  <span>${esc(c.address || 'Alamat belum diisi')}</span>
+                </div>
+
+                ${c.location_note ? `
+                  <div class="cust-meta-item" style="color:#64748b;font-size:12px">
+                    <span class="cust-meta-icon">📌</span>
+                    <span>Patokan: ${esc(c.location_note)}</span>
+                  </div>
+                ` : ''}
+
+                ${c.nik ? `
+                  <div class="cust-meta-item" style="color:#64748b;font-size:12px">
+                    <span class="cust-meta-icon">🪪</span>
+                    <span>NIK: ${esc(c.nik)}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </td>
+
+            <!-- Kolom 2: Paket & Tagihan Bulanan -->
+            <td>
+              <div style="font-weight:700;color:var(--text);font-size:14px">${esc(c.package_name || '-')}</div>
+              <div style="font-size:15px;font-weight:800;color:var(--primary)">Rp ${price.toLocaleString('id-ID')} / bln</div>
+            </td>
+
+            <!-- Kolom 3: Jatuh Tempo -->
+            <td>
+              <span style="font-size:13px;font-weight:700;color:#334155">Tgl ${esc(c.due_day || '10')}</span>
+              <div style="font-size:11px;color:var(--muted)">Setiap bulan</div>
+            </td>
+
+            <!-- Kolom 4: Status Bayar -->
+            <td>
+              ${badgeStatus}
+            </td>
+
+            <!-- Kolom 5: Tombol Aksi Lengkap & Jelas -->
+            <td style="text-align:right">
+              <div class="row-actions" style="justify-content:flex-end">
+                <!-- Tombol EDIT DATA DIRI & TAGIHAN (SANGAT JELAS) -->
+                <button class="btn btn-edit btn-sm" onclick="window.openEditModal('${c.customer_code}')">
+                  ✏️ Edit Data Diri & Tagihan
+                </button>
+
+                <!-- Tombol LIHAT PROFIL LENGKAP -->
+                <button class="btn btn-outline btn-sm" onclick="window.openDetailModal('${c.customer_code}')" title="Lihat Profil">
+                  👁️ Detail
+                </button>
+
+                ${isPending ? `
+                  <button class="btn btn-success btn-sm" onclick="window.markPayment('${c.customer_code}', true, '${v.payment_method || 'Transfer'}')">
+                    ✓ Setujui Lunas
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="window.markPayment('${c.customer_code}', false)">
+                    ✕ Tolak
+                  </button>
+                ` : isPaid ? `
+                  <button class="btn btn-danger btn-sm" onclick="window.markPayment('${c.customer_code}', false)">
+                    ↺ Batal Lunas
+                  </button>
+                ` : `
+                  <button class="btn btn-success btn-sm" onclick="window.markPayment('${c.customer_code}', true, 'Cash')">
+                    💵 Cash
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="window.markPayment('${c.customer_code}', true, 'Transfer')">
+                    💳 Trf
+                  </button>
+                `}
+
+                <button class="btn btn-wa btn-sm" onclick="window.sendWABill('${c.customer_code}')" title="Kirim Tagihan WA">
+                  📲 WA
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 4. Filter Tabs & Search
+    $('filterStatusTabs').querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        $('filterStatusTabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderTable();
+      };
+    });
+
+    $('btnViewPendingList').onclick = () => {
+      $('filterStatusTabs').querySelector('[data-filter="pending"]').click();
+    };
+
+    $('inputSearch').oninput = renderTable;
+
+    // 5. Konfirmasi Pembayaran
+    window.markPayment = async function(code, isPaid, method = 'Cash') {
+      const c = db.find(item => item.customer_code === code);
+      if (!c) return;
+
+      const v = c.visit_checklist || {};
+      if (isPaid) {
+        v.payment_status = 'Lunas';
+        v.payment_method = method;
+        v.payment_date = new Date().toISOString().slice(0, 10);
+        v.pending_approval = false;
+      } else {
+        v.payment_status = 'Belum Bayar';
+        v.payment_method = null;
+        v.payment_date = null;
+        v.pending_approval = false;
+      }
+
+      const { error } = await supabase
+        .from('customers')
+        .update({ visit_checklist: v })
+        .eq('customer_code', code);
+
+      if (error) {
+        alert('Gagal update status pembayaran: ' + error.message);
+      } else {
+        c.visit_checklist = v;
+        renderStats();
+        renderTable();
+      }
+    };
+
+    // 6. Kirim Tagihan WhatsApp
+    window.sendWABill = function(code) {
+      const c = db.find(item => item.customer_code === code);
+      if (!c) return;
+
+      const phone = (c.whatsapp || '').replace(/[^0-9]/g, '');
+      const price = Number(c.monthly_price || 0).toLocaleString('id-ID');
+      const due = c.due_day || '10';
+
+      const msg = encodeURIComponent(
+        `Halo Kak *${c.name}* (ID: ${c.customer_code}),\n\n` +
+        `Kami dari *WBnetwork* ingin menginformasikan tagihan internet bulan ini:\n` +
+        `⚡ *Paket:* ${c.package_name || 'Home Fiber'}\n` +
+        `💰 *Nominal:* Rp ${price}\n` +
+        `📅 *Jatuh Tempo:* Tgl ${due} bulan ini\n\n` +
+        `Cek rincian & konfirmasi pembayaran di link portal:\n` +
+        `http://${location.host}/?id=${c.customer_code}\n\n` +
+        `Terima kasih telah menggunakan layanan WBnetwork! 🙏`
+      );
+
+      const url = phone ? `https://wa.me/${phone.startsWith('0') ? '62' + phone.slice(1) : phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
+      window.open(url, '_blank');
+    };
+
+    // 7. Modal Edit Data Diri & Tagihan
+    window.openEditModal = function(code) {
+      const c = db.find(item => item.customer_code === code);
+      if (!c) return;
+
+      $('editCustCode').value = c.customer_code;
+      $('dispEditCustCode').value = c.customer_code;
+      $('editName').value = c.name || '';
+      $('editWhatsapp').value = c.whatsapp || '';
+      $('editNik').value = c.nik || '';
+      $('editAddress').value = c.address || '';
+      $('editLocationNote').value = c.location_note || '';
+
+      $('editPackageName').value = c.package_name || '';
+      $('editMonthlyPrice').value = c.monthly_price || 0;
+      $('editDueDay').value = c.due_day || 10;
+      $('editCustomerStatus').value = c.customer_status || 'aktif';
+      $('editSaveMsg').innerHTML = '';
+
+      $('modalEdit').classList.remove('hidden');
+    };
+
+    $('btnCloseEdit').onclick = () => $('modalEdit').classList.add('hidden');
+    $('btnCancelEdit').onclick = () => $('modalEdit').classList.add('hidden');
+
+    $('btnSaveEdit').onclick = async () => {
+      const code = $('editCustCode').value;
+      const c = db.find(item => item.customer_code === code);
+      if (!c) return;
+
+      const payload = {
+        name: $('editName').value.trim(),
+        whatsapp: $('editWhatsapp').value.trim() || null,
+        nik: $('editNik').value.trim() || null,
+        address: $('editAddress').value.trim() || null,
+        location_note: $('editLocationNote').value.trim() || null,
+        package_name: $('editPackageName').value.trim(),
+        monthly_price: $('editMonthlyPrice').value ? Number($('editMonthlyPrice').value) : 0,
+        due_day: $('editDueDay').value ? Number($('editDueDay').value) : 10,
+        customer_status: $('editCustomerStatus').value
+      };
+
+      $('editSaveMsg').innerHTML = '<span style="color:var(--primary)">⏳ Menyimpan data diri & tagihan ke Supabase...</span>';
+
+      const { error } = await supabase
+        .from('customers')
+        .update(payload)
+        .eq('customer_code', code);
+
+      if (error) {
+        $('editSaveMsg').innerHTML = `<span style="color:var(--danger)">❌ Gagal: ${error.message}</span>`;
+      } else {
+        Object.assign(c, payload);
+        $('editSaveMsg').innerHTML = '<span style="color:var(--success)">✓ Berhasil disimpan! Data diri dan tagihan telah terupdate.</span>';
+        setTimeout(() => {
+          $('modalEdit').classList.add('hidden');
+          renderStats();
+          renderTable();
+        }, 800);
+      }
+    };
+
+    // 8. Modal Detail Lengkap Pelanggan
+    window.openDetailModal = function(code) {
+      const c = db.find(item => item.customer_code === code);
+      if (!c) return;
+      selectedDetailCustomer = c;
+
+      $('detCustCode').textContent = c.customer_code;
+      $('detCustName').textContent = c.name || 'Tanpa Nama';
+      $('detWhatsapp').textContent = c.whatsapp || 'Belum diisi';
+      $('detNik').textContent = c.nik || '-';
+      $('detAddress').textContent = c.address || 'Belum diisi';
+      $('detLocationNote').textContent = c.location_note || '-';
+      $('detPackageName').textContent = c.package_name || '-';
+      $('detMonthlyPrice').textContent = 'Rp ' + Number(c.monthly_price || 0).toLocaleString('id-ID') + ' / bln';
+      $('detDueDay').textContent = `Tgl ${c.due_day || '10'} setiap bulan`;
+
+      const v = c.visit_checklist || {};
+      const isPaid = (v.payment_status === 'Lunas');
+      const badge = $('detCustBadge');
+      if (isPaid) {
+        badge.className = 'badge badge-paid';
+        badge.textContent = `✓ Lunas (${v.payment_method || 'Kas'})`;
+      } else {
+        badge.className = 'badge badge-unpaid';
+        badge.textContent = '⏳ Belum Bayar';
+      }
+
+      $('modalDetail').classList.remove('hidden');
+    };
+
+    $('btnCloseDetail').onclick = () => $('modalDetail').classList.add('hidden');
+    $('btnCloseDetailFoot').onclick = () => $('modalDetail').classList.add('hidden');
+
+    $('btnEditFromDetail').onclick = () => {
+      $('modalDetail').classList.add('hidden');
+      if (selectedDetailCustomer) window.openEditModal(selectedDetailCustomer.customer_code);
+    };
+
+    $('btnDeleteCustomer').onclick = async () => {
+      if (!selectedDetailCustomer) return;
+      const c = selectedDetailCustomer;
+      if (!confirm(`⚠️ PERINGATAN: Apakah Anda yakin ingin MENGHAPUS pelanggan ${c.customer_code} - ${c.name}? Data yang dihapus tidak dapat dikembalikan.`)) {
+        return;
+      }
+
+      const { error } = await supabase
+        .from('customers')
+        .delete()
+        .eq('customer_code', c.customer_code);
+
+      if (error) {
+        alert('Gagal menghapus: ' + error.message);
+      } else {
+        db = db.filter(item => item.customer_code !== c.customer_code);
+        $('modalDetail').classList.add('hidden');
+        renderStats();
+        renderTable();
+        alert(`✓ Pelanggan ${c.customer_code} (${c.name}) berhasil dihapus.`);
+      }
+    };
+
+    // 9. Daftarkan Pelanggan Baru & Generate ID
+    $('btnOpenAddModal').onclick = () => {
+      let maxNum = 0;
+      db.forEach(c => {
+        const m = (c.customer_code || '').match(/WB(\d+)/i);
+        if (m) {
+          const num = parseInt(m[1], 10);
+          if (num > maxNum) maxNum = num;
+        }
+      });
+      const nextId = 'WB' + String(maxNum + 1).padStart(4, '0');
+
+      $('addCustCode').value = nextId;
+      $('addName').value = '';
+      $('addWhatsapp').value = '';
+      $('addNik').value = '';
+      $('addAddress').value = '';
+      $('addLocationNote').value = '';
+      $('addSaveMsg').innerHTML = '';
+      $('modalAdd').classList.remove('hidden');
+    };
+
+    $('btnCloseAdd').onclick = () => $('modalAdd').classList.add('hidden');
+    $('btnCancelAdd').onclick = () => $('modalAdd').classList.add('hidden');
+
+    window.onAddPresetChange = function() {
+      const val = $('addPackagePreset').value;
+      const [name, price] = val.split('|');
+      $('addMonthlyPrice').value = price;
+    };
+
+    let newlyRegisteredCustomer = null;
+
+    $('btnSaveAdd').onclick = async () => {
+      const code = $('addCustCode').value.trim();
+      const name = $('addName').value.trim();
+      if (!code || !name) {
+        $('addSaveMsg').innerHTML = '<span style="color:var(--danger)">⚠️ ID dan Nama wajib diisi</span>';
+        return;
+      }
+
+      const preset = $('addPackagePreset').value.split('|');
+      const pkgName = preset[0];
+      const price = Number($('addMonthlyPrice').value || preset[1]);
+
+      const newCust = {
+        customer_code: code,
+        name: name,
+        whatsapp: $('addWhatsapp').value.trim() || null,
+        nik: $('addNik').value.trim() || null,
+        address: $('addAddress').value.trim() || null,
+        location_note: $('addLocationNote').value.trim() || null,
+        due_day: Number($('addDueDay').value || 10),
+        package_name: pkgName,
+        monthly_price: price,
+        customer_status: 'aktif',
+        connection_status: 'online',
+        verification_status: 'Sudah diverifikasi',
+        visit_checklist: { data: true, pppoe: true, app: true, registered: true, online: true, payment_status: 'Belum Bayar' }
+      };
+
+      $('addSaveMsg').innerHTML = '<span style="color:var(--primary)">⏳ Mendaftarkan pelanggan di Supabase...</span>';
+
+      const { data, error } = await supabase
+        .from('customers')
+        .insert([newCust])
+        .select();
+
+      if (error) {
+        $('addSaveMsg').innerHTML = `<span style="color:var(--danger)">❌ Gagal: ${error.message}</span>`;
+      } else {
+        db.push(newCust);
+        newlyRegisteredCustomer = newCust;
+        $('modalAdd').classList.add('hidden');
+
+        // Tampilkan modal sukses dengan ID Pelanggan
+        $('succCustCode').textContent = newCust.customer_code;
+        $('succCustName').textContent = newCust.name;
+        $('succCustPlan').textContent = `${newCust.package_name} • Rp ${newCust.monthly_price.toLocaleString('id-ID')}/bln`;
+        $('modalSuccessAdd').classList.remove('hidden');
+
+        renderStats();
+        renderTable();
+      }
+    };
+
+    $('btnCloseSuccessAdd').onclick = () => $('modalSuccessAdd').classList.add('hidden');
+
+    $('btnShareNewCustWA').onclick = () => {
+      if (!newlyRegisteredCustomer) return;
+      const c = newlyRegisteredCustomer;
+      const phone = (c.whatsapp || '').replace(/[^0-9]/g, '');
+      const price = Number(c.monthly_price || 0).toLocaleString('id-ID');
+
+      const msg = encodeURIComponent(
+        `Selamat Datang di *WBnetwork*, Kak *${c.name}*! 🎉\n\n` +
+        `Layanan internet Anda telah terdaftar resmi:\n` +
+        `🆔 *ID Pelanggan:* *${c.customer_code}*\n` +
+        `⚡ *Paket:* ${c.package_name}\n` +
+        `💰 *Tarif Bulanan:* Rp ${price}\n` +
+        `📅 *Jatuh Tempo:* Tgl ${c.due_day} setiap bulan\n\n` +
+        `Buka & pantau tagihan Anda di aplikasi web kami:\n` +
+        `http://${location.host}/?id=${c.customer_code}\n\n` +
+        `Simpan ID Pelanggan Anda untuk login di HP. Terima kasih! 🙏`
+      );
+
+      const url = phone ? `https://wa.me/${phone.startsWith('0') ? '62' + phone.slice(1) : phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
+      window.open(url, '_blank');
+    };
+
+    // 10. Pengaturan Master QRIS & Rekening
+    $('btnOpenBankModal').onclick = () => {
+      renderBankMethodsList();
+      $('bankSaveMsg').innerHTML = '';
+      $('modalBankSettings').classList.remove('hidden');
+    };
+
+    $('btnCloseBankModal').onclick = () => $('modalBankSettings').classList.add('hidden');
+    $('btnCancelBankModal').onclick = () => $('modalBankSettings').classList.add('hidden');
+
+    // Handler Upload Foto QRIS
+    $('inputQrisFile').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        currentQrisImage = evt.target.result;
+        $('qrisMasterPreview').src = currentQrisImage;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    function renderBankMethodsList() {
+      const container = $('bankMethodsList');
+      const nonQris = paymentMethods.filter(m => m.type !== 'qris');
+
+      if (nonQris.length === 0) {
+        container.innerHTML = '<div style="color:var(--muted);font-size:13px">Belum ada rekening bank terdaftar.</div>';
+        return;
+      }
+
+      container.innerHTML = nonQris.map((m, idx) => `
+        <div class="method-item">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--primary)">${esc(m.name)}</div>
+            <div style="font-size:14px;font-weight:800;color:#0f172a">${esc(m.accountNumber)}</div>
+            <div style="font-size:12px;color:var(--muted)">a.n. ${esc(m.accountHolder)}</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="window.removePaymentMethod('${m.id}')">
+            🗑️ Hapus
+          </button>
+        </div>
+      `).join('');
+    }
+
+    window.removePaymentMethod = function(id) {
+      paymentMethods = paymentMethods.filter(m => m.id !== id);
+      renderBankMethodsList();
+    };
+
+    $('btnAddMethod').onclick = () => {
+      const type = $('newMethodType').value;
+      const name = $('newMethodName').value.trim();
+      const no = $('newMethodAccNo').value.trim();
+      const holder = $('newMethodHolder').value.trim();
+
+      if (!name || !no || !holder) {
+        alert('Mohon lengkapi Nama Bank, No Rekening, dan Atas Nama');
+        return;
+      }
+
+      paymentMethods.push({
+        id: 'method-' + Date.now(),
+        type,
+        name,
+        accountNumber: no,
+        accountHolder: holder
+      });
+
+      $('newMethodName').value = '';
+      $('newMethodAccNo').value = '';
+      $('newMethodHolder').value = '';
+
+      renderBankMethodsList();
+    };
+
+    $('btnSaveBankModal').onclick = async () => {
+      $('bankSaveMsg').innerHTML = '<span style="color:var(--primary)">⏳ Menyimpan QRIS, Rekening & Nomor WA ke server...</span>';
+
+      const adminWa = $('inputAdminWa').value.trim() || '081234567890';
+      const qrisName = $('inputQrisMerchant').value.trim() || 'WBnetwork Official QRIS';
+      const qrisNmid = $('inputQrisNmid').value.trim() || 'ID1020304050';
+
+      // Pastikan ada item QRIS di paymentMethods
+      paymentMethods = paymentMethods.filter(m => m.type !== 'qris');
+      paymentMethods.unshift({
+        id: 'qris-master',
+        type: 'qris',
+        name: qrisName,
+        accountNumber: qrisNmid,
+        accountHolder: qrisName,
+        imageUrl: currentQrisImage
+      });
+
+      const payload = {
+        adminWhatsapp: adminWa,
+        paymentMethods: paymentMethods
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          $('headerAdminWa').textContent = adminWa;
+          $('dispQrisMerchantName').textContent = qrisName;
+          $('dispQrisNmid').textContent = 'NMID: ' + qrisNmid;
+          $('bankSaveMsg').innerHTML = '<span style="color:var(--success)">✓ Berhasil disimpan! QRIS & Nomor WA tersinkron untuk SEMUA pelanggan.</span>';
+          setTimeout(() => $('modalBankSettings').classList.add('hidden'), 1200);
+        } else {
+          throw new Error(json.message);
+        }
+      } catch (err) {
+        $('bankSaveMsg').innerHTML = `<span style="color:var(--danger)">❌ Gagal: ${err.message}</span>`;
+      }
+    };
+
+    // 10.B Handler Khusus Modal Nomor WhatsApp Admin
+    $('btnOpenWaModal').onclick = () => {
+      $('dedicatedAdminWaInput').value = $('inputAdminWa').value || '081234567890';
+      $('saveWaMsg').innerHTML = '';
+      $('modalAdminWa').classList.remove('hidden');
+    };
+
+    $('btnCloseWaModal').onclick = () => $('modalAdminWa').classList.add('hidden');
+    $('btnCancelWaModal').onclick = () => $('modalAdminWa').classList.add('hidden');
+
+    $('btnSaveDedicatedWa').onclick = async () => {
+      const val = $('dedicatedAdminWaInput').value.trim();
+      if (!val) {
+        alert('Nomor WhatsApp Admin wajib diisi!');
+        return;
+      }
+
+      $('saveWaMsg').innerHTML = '<span style="color:var(--primary)">⏳ Menyimpan nomor WA Admin...</span>';
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminWhatsapp: val })
+        });
+        const json = await res.json();
+        if (json.success) {
+          $('headerAdminWa').textContent = val;
+          $('inputAdminWa').value = val;
+          $('saveWaMsg').innerHTML = '<span style="color:var(--success)">✓ Nomor WhatsApp Admin berhasil disimpan & aktif!</span>';
+          setTimeout(() => $('modalAdminWa').classList.add('hidden'), 1000);
+        } else {
+          throw new Error(json.message);
+        }
+      } catch (err) {
+        $('saveWaMsg').innerHTML = `<span style="color:var(--danger)">❌ Gagal: ${err.message}</span>`;
+      }
+    };
+
+    $('btnTestAdminWa').onclick = () => {
+      const val = $('dedicatedAdminWaInput').value.trim() || '081234567890';
+      const clean = val.replace(/[^0-9]/g, '');
+      const target = clean.startsWith('0') ? '62' + clean.slice(1) : clean;
+      window.open(`https://wa.me/${target}?text=${encodeURIComponent('Halo, tes koneksi WhatsApp Admin WBnetwork berhasil terhubung! ✅')}`, '_blank');
+    };
+
+    // 11. Penyesuaian Tarif Massal
+    $('btnOpenMassPrice').onclick = () => $('modalMassPrice').classList.remove('hidden');
+    $('btnCloseMassPrice').onclick = () => $('modalMassPrice').classList.add('hidden');
+    $('btnCancelMassPrice').onclick = () => $('modalMassPrice').classList.add('hidden');
+
+    $('btnExecuteMassPrice').onclick = async () => {
+      const targetPkg = $('massTargetPkg').value;
+      const newPrice = Number($('massNewPrice').value);
+
+      if (!newPrice || newPrice <= 0) {
+        $('massPriceMsg').innerHTML = '<span style="color:var(--danger)">⚠️ Masukkan nominal harga baru yang valid</span>';
+        return;
+      }
+
+      if (!confirm(`Yakin ingin mengubah tarif SEMUA pelanggan paket ${targetPkg} menjadi Rp ${newPrice.toLocaleString('id-ID')}?`)) {
+        return;
+      }
+
+      $('massPriceMsg').innerHTML = '<span style="color:var(--primary)">⏳ Mengupdate tarif paket di Supabase...</span>';
+
+      const { error } = await supabase
+        .from('customers')
+        .update({ monthly_price: newPrice })
+        .eq('package_name', targetPkg);
+
+      if (error) {
+        $('massPriceMsg').innerHTML = `<span style="color:var(--danger)">❌ Gagal: ${error.message}</span>`;
+      } else {
+        db.forEach(c => {
+          if (c.package_name === targetPkg) c.monthly_price = newPrice;
+        });
+        $('massPriceMsg').innerHTML = '<span style="color:var(--success)">✓ Seluruh tarif paket berhasil diperbarui!</span>';
+        setTimeout(() => {
+          $('modalMassPrice').classList.add('hidden');
+          renderStats();
+          renderTable();
+        }, 1000);
+      }
+    };
+
+    loadCustomers();
+  </script>
+</body>
+</html>
