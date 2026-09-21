@@ -2,12 +2,13 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
+const crypto = require('crypto');
 const supabase = require('./db');
+const { getEmailSettings, sendOtpEmail } = require('./mailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
-const PAYMENT_METHODS_FILE = path.join(__dirname, 'payment_methods.json');
 
 // Helper Get & Save Settings
 function getSettings() {
@@ -19,7 +20,15 @@ function getSettings() {
   return {
     adminWhatsapp: '081234567890',
     merchantName: 'WBnetwork RT/RW Net',
-    paymentMethods: []
+    paymentMethods: [],
+    smtp: {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      user: '',
+      pass: '',
+      from: 'WBnetwork Billing <no-reply@wbnetwork.id>'
+    }
   };
 }
 
@@ -35,13 +44,14 @@ app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.use(express.static(__dirname, { index: false }));
 
 // Helper Pemformat Data
-function formatResponse(customer, listTagihan, listTiket) {
+function formatResponse(customer, listTagihan = [], listTiket = []) {
   const tagihan = listTagihan && listTagihan.length > 0 ? listTagihan[0] : null;
   const tiketAktif = listTiket && listTiket.length > 0 ? listTiket[0] : null;
 
   const pkg = customer.package_name || customer.paket || '20 Mbps Home Fiber';
   const price = (tagihan && tagihan.nominal) || customer.monthly_price || 200000;
   const due = (tagihan && (tagihan.jatuh_tempo || tagihan.jatuhTempo)) || customer.due_day || '10';
+  const v = customer.visit_checklist || {};
 
   return {
     success: true,
@@ -49,14 +59,18 @@ function formatResponse(customer, listTagihan, listTiket) {
       id: customer.customer_code,
       customer_code: customer.customer_code,
       name: customer.name,
+      email: v.email || null,
+      whatsapp: customer.whatsapp || null,
+      nik: customer.nik || null,
       status: customer.customer_status || customer.status || 'aktif',
       connection_status: customer.connection_status || customer.status_koneksi || 'online',
       package: pkg,
       package_name: pkg,
       address: customer.address || customer.alamat || 'Alamat tidak diisi',
+      location_note: customer.location_note || '',
       monthly_price: price,
       due_day: due,
-      visit_checklist: customer.visit_checklist || {},
+      visit_checklist: v,
       
       tagihan: tagihan ? {
         bulan: tagihan.bulan,
@@ -66,7 +80,7 @@ function formatResponse(customer, listTagihan, listTiket) {
       } : {
         bulan: 'Bulan Ini',
         nominal: price,
-        status: (customer.visit_checklist && customer.visit_checklist.payment_status) || 'Belum Lunas',
+        status: v.payment_status || 'Belum Lunas',
         jatuhTempo: due
       },
       tiketAktif: tiketAktif ? {
@@ -89,8 +103,357 @@ app.get(['/admin', '/admin.html', '/app', '/app.html', '/dashboard'], (req, res)
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 2. Handler API Data Pelanggan
-app.get(['/api/pelanggan/:id', '/pelanggan/data/:id', '/api/customer/:id', '/pelanggan/:id'], async (req, res) => {
+// ==========================================
+// 2. AUTHENTICATION (EMAIL & OTP PELANGGAN)
+// ==========================================
+
+// A. Kirim OTP untuk Registrasi Email Pelanggan
+app.post('/api/auth/register-send-otp', async (req, res) => {
+  const { customerCode, email, verificationKey } = req.body;
+
+  if (!customerCode || !email) {
+    return res.status(400).json({ success: false, message: "ID Pelanggan dan Email wajib diisi." });
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    return res.status(400).json({ success: false, message: "Format alamat email tidak valid." });
+  }
+
+  try {
+    // 1. Cari pelanggan berdasarkan customer_code
+    const { data: listCustomers, error: errCust } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('customer_code', customerCode.toUpperCase().trim())
+      .limit(1);
+
+    if (errCust) throw errCust;
+    const customer = listCustomers && listCustomers[0];
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: `ID Pelanggan '${customerCode}' tidak ditemukan.` });
+    }
+
+    const v = customer.visit_checklist || {};
+
+    // 2. Jika ada verificationKey (No WA / NIK / Nama), verifikasi keabsahan
+    if (verificationKey && verificationKey.trim()) {
+      const vKeyClean = verificationKey.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const dbWaClean = (customer.whatsapp || '').replace(/[^0-9]/g, '');
+      const dbNikClean = (customer.nik || '').replace(/[^0-9]/g, '');
+      const dbNameClean = (customer.name || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+      let match = false;
+      if (dbWaClean && (dbWaClean.includes(vKeyClean) || vKeyClean.includes(dbWaClean))) match = true;
+      if (dbNikClean && (dbNikClean.includes(vKeyClean) || vKeyClean.includes(dbNikClean))) match = true;
+      if (dbNameClean && (dbNameClean.includes(vKeyClean) || vKeyClean.includes(dbNameClean))) match = true;
+
+      // Jika data WA/NIK di DB masih kosong, loloskan verifikasi awal
+      if (!dbWaClean && !dbNikClean) match = true;
+
+      if (!match) {
+        return res.status(400).json({
+          success: false,
+          message: "Data verifikasi (Nomor WA / NIK / Nama) tidak sesuai dengan data terdaftar pada ID ini."
+        });
+      }
+    }
+
+    // 3. Generate 6 Digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 menit
+
+    v.pending_email_reg = {
+      email: cleanEmail,
+      otp,
+      expiresAt
+    };
+
+    const { error: updErr } = await supabase
+      .from('customers')
+      .update({ visit_checklist: v })
+      .eq('customer_code', customer.customer_code);
+
+    if (updErr) throw updErr;
+
+    // 4. Kirim Email OTP
+    const mailRes = await sendOtpEmail(cleanEmail, otp, customer.name, 'register');
+
+    res.json({
+      success: true,
+      message: `Kode OTP 6-digit berhasil dikirim ke ${cleanEmail}. Silakan cek kotak masuk/spam email Anda.`,
+      simulated: mailRes.simulated || false,
+      debugOtp: mailRes.simulated ? otp : undefined
+    });
+  } catch (err) {
+    console.error("Register OTP Error:", err);
+    res.status(500).json({ success: false, message: err.message || "Gagal mengirim OTP." });
+  }
+});
+
+// B. Verifikasi OTP Registrasi & Simpan Email ke Akun
+app.post('/api/auth/register-verify-otp', async (req, res) => {
+  const { customerCode, otp } = req.body;
+
+  if (!customerCode || !otp) {
+    return res.status(400).json({ success: false, message: "ID Pelanggan dan Kode OTP wajib diisi." });
+  }
+
+  try {
+    const { data: listCustomers, error: errCust } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('customer_code', customerCode.toUpperCase().trim())
+      .limit(1);
+
+    if (errCust) throw errCust;
+    const customer = listCustomers && listCustomers[0];
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: "Pelanggan tidak ditemukan." });
+    }
+
+    const v = customer.visit_checklist || {};
+    const pending = v.pending_email_reg;
+
+    if (!pending || !pending.otp) {
+      return res.status(400).json({ success: false, message: "Tidak ada permintaan OTP registrasi yang aktif. Silakan minta OTP baru." });
+    }
+
+    if (Date.now() > pending.expiresAt) {
+      return res.status(400).json({ success: false, message: "Kode OTP telah kadaluarsa. Silakan minta kode OTP baru." });
+    }
+
+    if (pending.otp.trim() !== otp.trim()) {
+      return res.status(400).json({ success: false, message: "Kode OTP salah! Periksa kembali email Anda." });
+    }
+
+    // Sukses: Ikat email ke akun & buat session token
+    const verifiedEmail = pending.email;
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+
+    v.email = verifiedEmail;
+    v.email_verified_at = new Date().toISOString();
+    v.session_token = sessionToken;
+    delete v.pending_email_reg;
+
+    const { error: updErr } = await supabase
+      .from('customers')
+      .update({ visit_checklist: v })
+      .eq('customer_code', customer.customer_code);
+
+    if (updErr) throw updErr;
+
+    const { data: listTagihan } = await supabase.from('tagihan').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
+    const { data: listTiket } = await supabase.from('tiket').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
+
+    res.json({
+      success: true,
+      message: "Registrasi email berhasil! Anda telah masuk ke portal.",
+      token: sessionToken,
+      customer: formatResponse(customer, listTagihan, listTiket).data
+    });
+  } catch (err) {
+    console.error("Verify Register OTP Error:", err);
+    res.status(500).json({ success: false, message: err.message || "Gagal verifikasi OTP." });
+  }
+});
+
+// C. Kirim OTP untuk Login Pelanggan Terdaftar
+app.post('/api/auth/login-send-otp', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ success: false, message: "Email wajib diisi." });
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+
+  try {
+    // Cari pelanggan yang emailnya cocok
+    const { data: allCustomers, error: errCust } = await supabase
+      .from('customers')
+      .select('*');
+
+    if (errCust) throw errCust;
+
+    const customer = (allCustomers || []).find(c => {
+      const v = c.visit_checklist || {};
+      return (v.email && v.email.toLowerCase().trim() === cleanEmail);
+    });
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: `Email '${cleanEmail}' belum terdaftar. Silakan pilih tab 'Daftar Akun Baru' untuk mendaftarkan email Anda.`
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 menit
+
+    const v = customer.visit_checklist || {};
+    v.login_otp = {
+      otp,
+      expiresAt
+    };
+
+    const { error: updErr } = await supabase
+      .from('customers')
+      .update({ visit_checklist: v })
+      .eq('customer_code', customer.customer_code);
+
+    if (updErr) throw updErr;
+
+    const mailRes = await sendOtpEmail(cleanEmail, otp, customer.name, 'login');
+
+    res.json({
+      success: true,
+      message: `Kode OTP 6-digit telah dikirim ke ${cleanEmail}. Periksa inbox atau spam email Anda.`,
+      email: cleanEmail,
+      simulated: mailRes.simulated || false,
+      debugOtp: mailRes.simulated ? otp : undefined
+    });
+  } catch (err) {
+    console.error("Login OTP Error:", err);
+    res.status(500).json({ success: false, message: err.message || "Gagal mengirim OTP login." });
+  }
+});
+
+// D. Verifikasi OTP Login & Masuk Portal
+app.post('/api/auth/login-verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ success: false, message: "Email dan Kode OTP wajib diisi." });
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+
+  try {
+    const { data: allCustomers, error: errCust } = await supabase
+      .from('customers')
+      .select('*');
+
+    if (errCust) throw errCust;
+
+    const customer = (allCustomers || []).find(c => {
+      const v = c.visit_checklist || {};
+      return (v.email && v.email.toLowerCase().trim() === cleanEmail);
+    });
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: "Akun dengan email ini tidak ditemukan." });
+    }
+
+    const v = customer.visit_checklist || {};
+    const loginOtp = v.login_otp;
+
+    if (!loginOtp || !loginOtp.otp) {
+      return res.status(400).json({ success: false, message: "Tidak ada permintaan login yang aktif. Silakan minta kode OTP baru." });
+    }
+
+    if (Date.now() > loginOtp.expiresAt) {
+      return res.status(400).json({ success: false, message: "Kode OTP telah kadaluarsa. Silakan minta kode OTP baru." });
+    }
+
+    if (loginOtp.otp.trim() !== otp.trim()) {
+      return res.status(400).json({ success: false, message: "Kode OTP salah! Periksa kembali email Anda." });
+    }
+
+    // Sukses: Buat Session Token baru
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    v.session_token = sessionToken;
+    delete v.login_otp;
+
+    const { error: updErr } = await supabase
+      .from('customers')
+      .update({ visit_checklist: v })
+      .eq('customer_code', customer.customer_code);
+
+    if (updErr) throw updErr;
+
+    const { data: listTagihan } = await supabase.from('tagihan').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
+    const { data: listTiket } = await supabase.from('tiket').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
+
+    res.json({
+      success: true,
+      message: "Login berhasil!",
+      token: sessionToken,
+      customer: formatResponse(customer, listTagihan, listTiket).data
+    });
+  } catch (err) {
+    console.error("Verify Login OTP Error:", err);
+    res.status(500).json({ success: false, message: err.message || "Gagal verifikasi OTP." });
+  }
+});
+
+// E. Cek Session Token Pelanggan (Auto Login / Auth Check)
+app.get('/api/auth/me', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.slice(7) : req.query.token;
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Sesi tidak valid / belum login." });
+  }
+
+  try {
+    const { data: allCustomers, error: errCust } = await supabase
+      .from('customers')
+      .select('*');
+
+    if (errCust) throw errCust;
+
+    const customer = (allCustomers || []).find(c => {
+      const v = c.visit_checklist || {};
+      return (v.session_token && v.session_token === token);
+    });
+
+    if (!customer) {
+      return res.status(401).json({ success: false, message: "Sesi telah berakhir atau tidak valid." });
+    }
+
+    const { data: listTagihan } = await supabase.from('tagihan').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
+    const { data: listTiket } = await supabase.from('tiket').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
+
+    res.json(formatResponse(customer, listTagihan, listTiket));
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// F. Logout Pelanggan
+app.post('/api/auth/logout', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.json({ success: true, message: "Logged out." });
+
+  try {
+    const { data: allCustomers } = await supabase.from('customers').select('*');
+    const customer = (allCustomers || []).find(c => {
+      const v = c.visit_checklist || {};
+      return (v.session_token === token);
+    });
+
+    if (customer) {
+      const v = customer.visit_checklist || {};
+      delete v.session_token;
+      await supabase.from('customers').update({ visit_checklist: v }).eq('customer_code', customer.customer_code);
+    }
+
+    res.json({ success: true, message: "Logout berhasil." });
+  } catch (err) {
+    res.json({ success: true, message: "Logged out." });
+  }
+});
+
+// ==========================================
+// 3. HANDLER DATA PELANGGAN & SETTINGS
+// ==========================================
+
+// Handler API Data Pelanggan (Untuk Admin)
+app.get(['/api/pelanggan/:id', '/pelanggan/data/:id', '/api/customer/:id'], async (req, res) => {
   let id = req.params.id || req.query.id;
 
   if (!id || id.endsWith('.html') || id === 'customer' || id === 'pelanggan') {
@@ -131,7 +494,57 @@ app.get(['/api/pelanggan/:id', '/pelanggan/data/:id', '/api/customer/:id', '/pel
   }
 });
 
-// 3. API Settings (Nomor WhatsApp Admin & Metode Pembayaran)
+// Update Data Pelanggan (Termasuk Email & WhatsApp oleh Admin)
+app.put('/api/customers/:code', async (req, res) => {
+  const code = req.params.code;
+  const { name, whatsapp, nik, address, location_note, package_name, monthly_price, due_day, email, customer_status } = req.body;
+
+  try {
+    const { data: currentCust, error: getErr } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('customer_code', code)
+      .single();
+
+    if (getErr || !currentCust) {
+      return res.status(404).json({ success: false, message: "Pelanggan tidak ditemukan" });
+    }
+
+    const v = currentCust.visit_checklist || {};
+    if (email !== undefined) {
+      v.email = email ? email.toLowerCase().trim() : null;
+    }
+
+    const updatePayload = {
+      name: name !== undefined ? name : currentCust.name,
+      whatsapp: whatsapp !== undefined ? whatsapp : currentCust.whatsapp,
+      nik: nik !== undefined ? nik : currentCust.nik,
+      address: address !== undefined ? address : currentCust.address,
+      location_note: location_note !== undefined ? location_note : currentCust.location_note,
+      package_name: package_name !== undefined ? package_name : currentCust.package_name,
+      monthly_price: monthly_price !== undefined ? parseInt(monthly_price, 10) : currentCust.monthly_price,
+      due_day: due_day !== undefined ? String(due_day) : currentCust.due_day,
+      customer_status: customer_status !== undefined ? customer_status : currentCust.customer_status,
+      visit_checklist: v,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data: updated, error: updErr } = await supabase
+      .from('customers')
+      .update(updatePayload)
+      .eq('customer_code', code)
+      .select()
+      .single();
+
+    if (updErr) throw updErr;
+
+    res.json({ success: true, message: "Data pelanggan berhasil diperbarui!", data: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// API Settings
 app.get('/api/settings', (req, res) => {
   const settings = getSettings();
   res.json({ success: true, data: settings });
@@ -145,6 +558,28 @@ app.post('/api/settings', (req, res) => {
     res.json({ success: true, message: "Pengaturan berhasil disimpan!", data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Test Kirim Email SMTP
+app.post('/api/test-email', async (req, res) => {
+  const { targetEmail } = req.body;
+  if (!targetEmail) {
+    return res.status(400).json({ success: false, message: "Masukkan email tujuan uji coba." });
+  }
+
+  try {
+    const testOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const result = await sendOtpEmail(targetEmail, testOtp, 'Admin WBnetwork (Test)', 'login');
+    res.json({
+      success: true,
+      message: result.simulated
+        ? `Mode Simulasi Aktif: Kode OTP ${testOtp} dicatat di server. (Isi SMTP User & Password di pengaturan jika ingin email sungguhan terkirim).`
+        : `Email uji coba berhasil dikirim ke ${targetEmail}!`,
+      data: result
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: `Gagal mengirim email: ${err.message}` });
   }
 });
 
@@ -165,7 +600,7 @@ app.post('/api/payment-methods', (req, res) => {
   }
 });
 
-// 4. API Konfirmasi Pembayaran oleh Pelanggan
+// API Konfirmasi Pembayaran oleh Pelanggan
 app.post('/api/confirm-payment', async (req, res) => {
   const { customerCode, method, amount, invoiceNo } = req.body;
   if (!customerCode) {
@@ -208,7 +643,7 @@ app.post('/api/confirm-payment', async (req, res) => {
   }
 });
 
-// 5. 1-Klik Setujui Lunas via WhatsApp Link untuk Admin
+// 1-Klik Setujui Lunas via WhatsApp Link untuk Admin
 app.get('/api/approve-payment/:code', async (req, res) => {
   const code = req.params.code;
   const method = req.query.method || 'Transfer';
@@ -260,7 +695,7 @@ app.get('/api/approve-payment/:code', async (req, res) => {
   }
 });
 
-// 6. API Lapor Gangguan
+// API Lapor Gangguan
 app.post(['/api/lapor', '/lapor'], async (req, res) => {
   const { idPelanggan, kendala } = req.body;
   if (!idPelanggan || !kendala) {

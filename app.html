@@ -442,6 +442,9 @@
         <button id="btnOpenWaModal" class="btn btn-wa" style="font-weight:800;padding:8px 14px;box-shadow:0 2px 8px rgba(37,211,102,0.3)">
           📱 WA Admin: <span id="headerAdminWa">081234567890</span> ✏️
         </button>
+        <button id="btnOpenSmtpModal" class="btn btn-outline" style="color:white;border-color:#334155;background:#1e293b">
+          📧 Pengaturan Email & OTP
+        </button>
         <button id="btnOpenBankModal" class="btn btn-outline" style="color:white;border-color:#334155;background:#1e293b">
           🏦 Atur QRIS & Rekening
         </button>
@@ -561,6 +564,11 @@
           <label class="form-label">Nomor KTP / NIK (Opsional)</label>
           <input type="text" id="editNik" class="form-input" placeholder="3201...">
         </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Alamat Email Terdaftar (Untuk Login OTP Pelanggan)</label>
+        <input type="email" id="editEmail" class="form-input" placeholder="contoh: pelanggan@gmail.com">
       </div>
 
       <div class="form-group">
@@ -905,6 +913,65 @@
     </div>
   </div>
 
+  <!-- MODAL PENGATURAN EMAIL & OTP -->
+  <div id="modalSmtp" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">📧 Konfigurasi Email & Pengiriman OTP</div>
+        <button class="btn btn-outline btn-sm" id="btnCloseSmtpModal">✕</button>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        Digunakan untuk mengirim kode 6-digit OTP keamanan saat pelanggan masuk (login) atau mendaftarkan email ke portal.
+      </p>
+
+      <div class="form-group" style="display:grid;grid-template-columns:2fr 1fr;gap:10px">
+        <div>
+          <label class="form-label">SMTP Host</label>
+          <input type="text" id="inputSmtpHost" class="form-input" value="smtp.gmail.com" placeholder="smtp.gmail.com">
+        </div>
+        <div>
+          <label class="form-label">Port</label>
+          <input type="number" id="inputSmtpPort" class="form-input" value="465" placeholder="465">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Pengirim (Akun Gmail / SMTP) *</label>
+        <input type="email" id="inputSmtpUser" class="form-input" placeholder="contoh: wbnetwork.official@gmail.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">App Password Gmail (16 Digit Sandi Aplikasi) *</label>
+        <input type="password" id="inputSmtpPass" class="form-input" placeholder="xxxx xxxx xxxx xxxx">
+        <div style="font-size:11.5px;color:var(--muted);margin-top:4px">
+          💡 Gunakan <b>Sandi Aplikasi (App Password)</b> Google. Jika belum diisi, sistem berjalan dalam <b>Mode Simulasi (Aman untuk Testing)</b>.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nama Pengirim</label>
+        <input type="text" id="inputSmtpFrom" class="form-input" value="WBnetwork Billing <no-reply@wbnetwork.id>">
+      </div>
+
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px;margin-top:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">🧪 UJI COBA PENGIRIMAN EMAIL OTP</div>
+        <div style="display:flex;gap:8px">
+          <input type="email" id="inputTestEmailTarget" class="form-input" placeholder="Ketik email penerima..." style="background:white">
+          <button id="btnSendTestEmail" class="btn btn-primary btn-sm" style="flex-shrink:0">Kirim Tes</button>
+        </div>
+        <div id="testEmailResult" style="font-size:12px;font-weight:600;margin-top:6px"></div>
+      </div>
+
+      <div id="smtpSaveMsg" style="font-size:13px;font-weight:700;margin-top:14px"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelSmtpModal">Tutup</button>
+        <button class="btn btn-primary" id="btnSaveSmtpSettings">💾 Simpan Pengaturan Email</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL KENAIKAN TARIF MASSAL -->
   <div id="modalMassPrice" class="modal-backdrop hidden">
     <div class="modal-card">
@@ -994,6 +1061,14 @@
             $('dispQrisNmid').textContent = 'NMID: ' + (qrisItem.accountNumber || 'ID1020304050');
             $('inputQrisMerchant').value = qrisItem.name || '';
             $('inputQrisNmid').value = qrisItem.accountNumber || '';
+          }
+
+          if (s.smtp) {
+            $('inputSmtpHost').value = s.smtp.host || 'smtp.gmail.com';
+            $('inputSmtpPort').value = s.smtp.port || 465;
+            $('inputSmtpUser').value = s.smtp.user || '';
+            $('inputSmtpPass').value = s.smtp.pass || '';
+            $('inputSmtpFrom').value = s.smtp.from || 'WBnetwork Billing <no-reply@wbnetwork.id>';
           }
         }
       } catch (err) {
@@ -1117,6 +1192,11 @@
                 <div class="cust-meta-item">
                   <span class="cust-meta-icon">📱</span>
                   <span>${cleanWa ? `<b>${esc(c.whatsapp)}</b> <a href="https://wa.me/${cleanWa.startsWith('0') ? '62'+cleanWa.slice(1) : cleanWa}" target="_blank" style="color:var(--primary);text-decoration:none;font-weight:700;margin-left:4px">[Chat WA]</a>` : '<span style="color:#ef4444">Nomor HP belum diisi</span>'}</span>
+                </div>
+
+                <div class="cust-meta-item">
+                  <span class="cust-meta-icon">✉️</span>
+                  <span>${v.email ? `<b style="color:#0284c7">${esc(v.email)}</b> <span style="font-size:10px;background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px">OTP Terdaftar</span>` : '<span style="color:#94a3b8">Email belum terdaftar</span>'}</span>
                 </div>
 
                 <div class="cust-meta-item">
@@ -1277,11 +1357,14 @@
       const c = db.find(item => item.customer_code === code);
       if (!c) return;
 
+      const v = c.visit_checklist || {};
+
       $('editCustCode').value = c.customer_code;
       $('dispEditCustCode').value = c.customer_code;
       $('editName').value = c.name || '';
       $('editWhatsapp').value = c.whatsapp || '';
       $('editNik').value = c.nik || '';
+      $('editEmail').value = v.email || '';
       $('editAddress').value = c.address || '';
       $('editLocationNote').value = c.location_note || '';
 
@@ -1302,6 +1385,10 @@
       const c = db.find(item => item.customer_code === code);
       if (!c) return;
 
+      const emailVal = $('editEmail').value.trim();
+      const v = c.visit_checklist || {};
+      v.email = emailVal ? emailVal.toLowerCase() : null;
+
       const payload = {
         name: $('editName').value.trim(),
         whatsapp: $('editWhatsapp').value.trim() || null,
@@ -1311,7 +1398,8 @@
         package_name: $('editPackageName').value.trim(),
         monthly_price: $('editMonthlyPrice').value ? Number($('editMonthlyPrice').value) : 0,
         due_day: $('editDueDay').value ? Number($('editDueDay').value) : 10,
-        customer_status: $('editCustomerStatus').value
+        customer_status: $('editCustomerStatus').value,
+        visit_checklist: v
       };
 
       $('editSaveMsg').innerHTML = '<span style="color:var(--primary)">⏳ Menyimpan data diri & tagihan ke Supabase...</span>';
@@ -1709,6 +1797,72 @@
           renderStats();
           renderTable();
         }, 1000);
+      }
+    };
+
+    // 12. Pengaturan SMTP & Email OTP
+    $('btnOpenSmtpModal').onclick = () => {
+      $('smtpSaveMsg').innerHTML = '';
+      $('testEmailResult').innerHTML = '';
+      $('modalSmtp').classList.remove('hidden');
+    };
+
+    $('btnCloseSmtpModal').onclick = () => $('modalSmtp').classList.add('hidden');
+    $('btnCancelSmtpModal').onclick = () => $('modalSmtp').classList.add('hidden');
+
+    $('btnSaveSmtpSettings').onclick = async () => {
+      $('smtpSaveMsg').innerHTML = '<span style="color:var(--primary)">⏳ Menyimpan pengaturan email...</span>';
+
+      const smtpData = {
+        host: $('inputSmtpHost').value.trim() || 'smtp.gmail.com',
+        port: parseInt($('inputSmtpPort').value.trim() || '465', 10),
+        secure: $('inputSmtpPort').value.trim() === '465',
+        user: $('inputSmtpUser').value.trim(),
+        pass: $('inputSmtpPass').value.trim(),
+        from: $('inputSmtpFrom').value.trim() || 'WBnetwork Billing <no-reply@wbnetwork.id>'
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ smtp: smtpData })
+        });
+        const json = await res.json();
+        if (json.success) {
+          $('smtpSaveMsg').innerHTML = '<span style="color:var(--success)">✓ Pengaturan email berhasil disimpan!</span>';
+          setTimeout(() => $('modalSmtp').classList.add('hidden'), 1200);
+        } else {
+          throw new Error(json.message);
+        }
+      } catch (err) {
+        $('smtpSaveMsg').innerHTML = `<span style="color:var(--danger)">❌ Gagal: ${err.message}</span>`;
+      }
+    };
+
+    $('btnSendTestEmail').onclick = async () => {
+      const target = $('inputTestEmailTarget').value.trim();
+      if (!target) {
+        alert('Ketik email tujuan uji coba terlebih dahulu.');
+        return;
+      }
+
+      $('testEmailResult').innerHTML = '<span style="color:var(--primary)">⏳ Mengirim email uji coba...</span>';
+
+      try {
+        const res = await fetch('/api/test-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetEmail: target })
+        });
+        const json = await res.json();
+        if (json.success) {
+          $('testEmailResult').innerHTML = `<span style="color:var(--success)">✓ ${json.message}</span>`;
+        } else {
+          $('testEmailResult').innerHTML = `<span style="color:var(--danger)">❌ ${json.message}</span>`;
+        }
+      } catch (err) {
+        $('testEmailResult').innerHTML = `<span style="color:var(--danger)">❌ Error: ${err.message}</span>`;
       }
     };
 
