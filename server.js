@@ -772,14 +772,40 @@ app.post(['/api/lapor', '/lapor'], async (req, res) => {
       await supabase.from('customers').update({ visit_checklist: v }).eq('customer_code', idPelanggan);
     }
 
-    res.json({
-      success: true,
-      message: "Laporan tersimpan",
-      tiket: { idTiket, idPelanggan, kendala, status: "Menunggu Teknisi" }
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+// ==========================================
+// 7. REAL SPEEDTEST API ENDPOINTS
+// ==========================================
+
+// A. Real Ping Endpoint
+app.get('/api/speedtest/ping', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.json({ success: true, timestamp: Date.now() });
+});
+
+// B. Real Download Test (Stream Binary Buffer)
+const randomChunk1MB = crypto.randomBytes(1024 * 1024); // 1MB buffer template
+app.get('/api/speedtest/download', (req, res) => {
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  const requestedMB = Math.min(Math.max(parseInt(req.query.size || '10', 10), 1), 30); // 1MB to 30MB
+  res.setHeader('Content-Length', String(requestedMB * 1024 * 1024));
+
+  for (let i = 0; i < requestedMB; i++) {
+    res.write(randomChunk1MB);
   }
+  res.end();
+});
+
+// C. Real Upload Test (Receive Binary Payload)
+app.post('/api/speedtest/upload', express.raw({ type: '*/*', limit: '50mb' }), (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache');
+  const size = req.body ? req.body.length : (parseInt(req.headers['content-length'] || '0', 10));
+  res.json({ success: true, bytesReceived: size, timestamp: Date.now() });
 });
 
 // Fallback JSON jika endpoint tidak ada
