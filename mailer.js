@@ -2,20 +2,37 @@ let nodemailer;
 try {
   nodemailer = require('nodemailer');
 } catch (e) {
-  // nodemailer will be installed in production build
+  // nodemailer will be available in production
 }
 const fs = require('fs');
 const path = require('path');
+const supabase = require('./db');
 
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 
-function getEmailSettings() {
+async function getEmailSettings() {
+  // 1. Cek Supabase SYSTEM_SETTINGS (Persisten di Cloud / Vercel)
+  try {
+    const { data } = await supabase
+      .from('customers')
+      .select('visit_checklist')
+      .eq('customer_code', 'SYSTEM_SETTINGS')
+      .single();
+    if (data && data.visit_checklist && data.visit_checklist.smtp) {
+      const s = data.visit_checklist.smtp;
+      if (s.user && s.pass) return s;
+    }
+  } catch (e) {}
+
+  // 2. Cek settings.json lokal
   if (fs.existsSync(SETTINGS_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
-      if (data.smtp) return data.smtp;
+      if (data.smtp && data.smtp.user && data.smtp.pass) return data.smtp;
     } catch (e) {}
   }
+
+  // 3. Cek Environment Variables Vercel
   return {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '465', 10),
@@ -27,9 +44,9 @@ function getEmailSettings() {
 }
 
 async function sendOtpEmail(toEmail, otpCode, customerName = 'Pelanggan', type = 'login') {
-  const smtp = getEmailSettings();
+  const smtp = await getEmailSettings();
 
-  const title = type === 'register' ? 'Verifikasi Pendaftaran Email' : 'Kode OTP Masuk Portal';
+  const title = type === 'register' ? 'Verifikasi Pendaftaran Email Pelanggan' : 'Kode OTP Masuk Portal Pelanggan';
   const desc = type === 'register' 
     ? `Terima kasih telah mendaftarkan email Anda untuk akun <b>${customerName}</b> di WBnetwork RT/RW Net. Gunakan kode OTP berikut untuk menyelesaikan verifikasi email Anda:`
     : `Halo <b>${customerName}</b>, kami menerima permintaan masuk ke portal pelanggan WBnetwork. Gunakan kode keamanan OTP 6 digit berikut:`;
@@ -63,7 +80,7 @@ async function sendOtpEmail(toEmail, otpCode, customerName = 'Pelanggan', type =
         </p>
         
         <div class="otp-box">
-          <div style="font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 6px;">KODE KEAMANAN ANDA</div>
+          <div style="font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 6px;">KODE KEAMANAN OTP ANDA</div>
           <div class="otp-code">${otpCode}</div>
           <div class="expiry">⏱️ Berlaku selama 10 menit</div>
         </div>
@@ -81,30 +98,34 @@ async function sendOtpEmail(toEmail, otpCode, customerName = 'Pelanggan', type =
     </html>
   `;
 
-  // Check if SMTP is configured
+  // Cek apakah SMTP sudah diisi
   if (!smtp.user || !smtp.pass) {
     console.log(`\n======================================================`);
-    console.log(`[TEST EMAIL OTP SENDER]`);
-    console.log(`To: ${toEmail} | Name: ${customerName}`);
-    console.log(`OTP Code: >>> [ ${otpCode} ] <<<`);
-    console.log(`Note: SMTP belum diisi di Admin Setting. Menggunakan Simulated Mode.`);
+    console.log(`[SIMULASI EMAIL OTP WBnetwork]`);
+    console.log(`Tujuan: ${toEmail} | Pelanggan: ${customerName}`);
+    console.log(`Kode OTP: >>> [ ${otpCode} ] <<<`);
+    console.log(`Catatan: Akun SMTP belum diisi di Admin Setting. OTP dicatat di layar.`);
     console.log(`======================================================\n`);
     return {
       success: true,
       simulated: true,
       otp: otpCode,
-      message: `Kode OTP terkirim ke ${toEmail} (Mode Simulasi OTP: ${otpCode})`
+      message: `Kode OTP (Simulasi): ${otpCode}. (Isi SMTP Gmail di Admin Setting agar terkirim ke email sungguhan).`
     };
+  }
+
+  if (!nodemailer) {
+    nodemailer = require('nodemailer');
   }
 
   try {
     const transporter = nodemailer.createTransport({
-      host: smtp.host,
-      port: smtp.port,
-      secure: smtp.secure,
+      host: smtp.host || 'smtp.gmail.com',
+      port: parseInt(smtp.port || '465', 10),
+      secure: (smtp.port === 465 || smtp.port === '465' || smtp.secure === true),
       auth: {
-        user: smtp.user,
-        pass: smtp.pass
+        user: smtp.user.trim(),
+        pass: smtp.pass.replace(/\s+/g, '') // Hapus spasi jika user copy-paste app password google dengan spasi
       },
       tls: {
         rejectUnauthorized: false
@@ -118,14 +139,17 @@ async function sendOtpEmail(toEmail, otpCode, customerName = 'Pelanggan', type =
       html: htmlContent
     });
 
+    console.log(`✅ [EMAIL OTP TERKIRIM]: Ke ${toEmail}, MsgId: ${info.messageId}`);
+
     return {
       success: true,
+      simulated: false,
       messageId: info.messageId,
-      message: `Kode OTP berhasil dikirim ke ${toEmail}`
+      message: `Kode OTP berhasil dikirim ke ${toEmail}. Silakan cek kotak masuk/spam email Anda.`
     };
   } catch (err) {
     console.error("❌ [MAILER ERROR]:", err.message);
-    throw new Error(`Gagal mengirim email: ${err.message}`);
+    throw new Error(`Gagal mengirim email: ${err.message}. Pastikan akun Gmail dan Sandi Aplikasi 16 digit sudah benar.`);
   }
 }
 

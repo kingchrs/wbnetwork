@@ -529,15 +529,15 @@
 
       <!-- FORM B: DAFTAR / HUBUNGKAN EMAIL DENGAN ID PELANGGAN -->
       <div id="formRegisterWrap" class="hidden">
-        <!-- Step 1: Validasi ID & Email -->
+        <!-- Step 1: Validasi ID, No HP & Email -->
         <div id="regStep1">
           <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">ID PELANGGAN (DARI ADMIN)</label>
           <input type="text" id="regCustCode" class="input-box" placeholder="contoh: WB0004 atau WB0001">
 
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">VERIFIKASI NO WHATSAPP / NIK / NAMA</label>
-          <input type="text" id="regVerifyKey" class="input-box" placeholder="Ketik No HP / NIK / Nama Anda yang terdaftar">
+          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">NOMOR WHATSAPP / HP PELANGGAN</label>
+          <input type="tel" id="regWhatsapp" class="input-box" placeholder="contoh: 081234567890">
 
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">EMAIL AKTIF ANDA</label>
+          <label style="display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">ALAMAT EMAIL AKTIF (UNTUK TERIMA OTP)</label>
           <input type="email" id="regEmail" class="input-box" placeholder="nama@gmail.com">
 
           <button id="btnRegSendOtp" class="btn btn-primary" onclick="handleRegisterSendOtp()">
@@ -918,7 +918,7 @@
     // C. Handler Register Send OTP
     async function handleRegisterSendOtp() {
       const customerCode = document.getElementById('regCustCode').value.trim();
-      const verificationKey = document.getElementById('regVerifyKey').value.trim();
+      const whatsapp = document.getElementById('regWhatsapp').value.trim();
       const email = document.getElementById('regEmail').value.trim();
 
       if (!customerCode || !email) {
@@ -935,7 +935,7 @@
         const res = await fetch('/api/auth/register-send-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ customerCode, verificationKey, email })
+          body: JSON.stringify({ customerCode, whatsapp, email })
         });
         const json = await res.json();
 

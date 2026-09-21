@@ -10,8 +10,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 
-// Helper Get & Save Settings
-function getSettings() {
+// Helper Get & Save Settings (Tersinkronisasi Permanen ke Supabase Cloud)
+async function getSettings() {
+  try {
+    const { data } = await supabase
+      .from('customers')
+      .select('visit_checklist')
+      .eq('customer_code', 'SYSTEM_SETTINGS')
+      .single();
+    if (data && data.visit_checklist) {
+      return data.visit_checklist;
+    }
+  } catch (e) {}
+
   if (fs.existsSync(SETTINGS_FILE)) {
     try {
       return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
@@ -32,8 +43,22 @@ function getSettings() {
   };
 }
 
-function saveSettings(settings) {
-  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf8');
+async function saveSettings(settings) {
+  try {
+    await supabase
+      .from('customers')
+      .upsert({
+        customer_code: 'SYSTEM_SETTINGS',
+        name: '__SYSTEM_SETTINGS__',
+        visit_checklist: settings
+      }, { onConflict: 'customer_code' });
+  } catch (e) {
+    console.error("Supabase settings upsert error:", e.message);
+  }
+
+  try {
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf8');
+  } catch (e) {}
 }
 
 // Middleware
@@ -109,7 +134,7 @@ app.get(['/admin', '/admin.html', '/app', '/app.html', '/dashboard'], (req, res)
 
 // A. Kirim OTP untuk Registrasi Email Pelanggan
 app.post('/api/auth/register-send-otp', async (req, res) => {
-  const { customerCode, email, verificationKey } = req.body;
+  const { customerCode, email, whatsapp, verificationKey } = req.body;
 
   if (!customerCode || !email) {
     return res.status(400).json({ success: false, message: "ID Pelanggan dan Email wajib diisi." });
@@ -120,6 +145,8 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
   if (!emailRegex.test(cleanEmail)) {
     return res.status(400).json({ success: false, message: "Format alamat email tidak valid." });
   }
+
+  const phoneInput = (whatsapp || verificationKey || '').trim();
 
   try {
     // 1. Cari pelanggan berdasarkan customer_code
@@ -138,9 +165,9 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
 
     const v = customer.visit_checklist || {};
 
-    // 2. Jika ada verificationKey (No WA / NIK / Nama), verifikasi keabsahan
-    if (verificationKey && verificationKey.trim()) {
-      const vKeyClean = verificationKey.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    // 2. Validasi kecocokan jika data di DB sudah ada
+    if (phoneInput) {
+      const vKeyClean = phoneInput.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
       const dbWaClean = (customer.whatsapp || '').replace(/[^0-9]/g, '');
       const dbNikClean = (customer.nik || '').replace(/[^0-9]/g, '');
       const dbNameClean = (customer.name || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -150,13 +177,13 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
       if (dbNikClean && (dbNikClean.includes(vKeyClean) || vKeyClean.includes(dbNikClean))) match = true;
       if (dbNameClean && (dbNameClean.includes(vKeyClean) || vKeyClean.includes(dbNameClean))) match = true;
 
-      // Jika data WA/NIK di DB masih kosong, loloskan verifikasi awal
+      // Jika data WA/NIK di DB masih kosong, jadikan nomor ini sebagai data pendaftar baru
       if (!dbWaClean && !dbNikClean) match = true;
 
-      if (!match) {
+      if (!match && dbWaClean) {
         return res.status(400).json({
           success: false,
-          message: "Data verifikasi (Nomor WA / NIK / Nama) tidak sesuai dengan data terdaftar pada ID ini."
+          message: "Nomor WhatsApp/HP tidak sesuai dengan data terdaftar pada ID Pelanggan ini."
         });
       }
     }
@@ -167,6 +194,7 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
 
     v.pending_email_reg = {
       email: cleanEmail,
+      whatsapp: phoneInput || customer.whatsapp || null,
       otp,
       expiresAt
     };
@@ -183,7 +211,9 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
 
     res.json({
       success: true,
-      message: `Kode OTP 6-digit berhasil dikirim ke ${cleanEmail}. Silakan cek kotak masuk/spam email Anda.`,
+      message: mailRes.simulated
+        ? `Mode Simulasi Aktif: Kode OTP Anda adalah [ ${otp} ]. (Atur akun Gmail di Admin Setting agar terkirim ke email sungguhan).`
+        : `Kode OTP 6-digit berhasil dikirim ke ${cleanEmail}. Silakan cek kotak masuk/spam email Anda.`,
       simulated: mailRes.simulated || false,
       debugOtp: mailRes.simulated ? otp : undefined
     });
@@ -193,7 +223,7 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
   }
 });
 
-// B. Verifikasi OTP Registrasi & Simpan Email ke Akun
+// B. Verifikasi OTP Registrasi & Simpan Email + Nomor WhatsApp ke Akun
 app.post('/api/auth/register-verify-otp', async (req, res) => {
   const { customerCode, otp } = req.body;
 
@@ -230,8 +260,9 @@ app.post('/api/auth/register-verify-otp', async (req, res) => {
       return res.status(400).json({ success: false, message: "Kode OTP salah! Periksa kembali email Anda." });
     }
 
-    // Sukses: Ikat email ke akun & buat session token
+    // Sukses: Ikat email ke akun, simpan No WA ke DB jika ada, & buat session token
     const verifiedEmail = pending.email;
+    const phoneToSave = pending.whatsapp || customer.whatsapp;
     const sessionToken = crypto.randomBytes(32).toString('hex');
 
     v.email = verifiedEmail;
@@ -239,12 +270,24 @@ app.post('/api/auth/register-verify-otp', async (req, res) => {
     v.session_token = sessionToken;
     delete v.pending_email_reg;
 
+    const updatePayload = {
+      visit_checklist: v,
+      verification_status: 'Sudah diverifikasi',
+      updated_at: new Date().toISOString()
+    };
+    if (phoneToSave) {
+      updatePayload.whatsapp = phoneToSave;
+    }
+
     const { error: updErr } = await supabase
       .from('customers')
-      .update({ visit_checklist: v })
+      .update(updatePayload)
       .eq('customer_code', customer.customer_code);
 
     if (updErr) throw updErr;
+
+    customer.whatsapp = phoneToSave || customer.whatsapp;
+    customer.visit_checklist = v;
 
     const { data: listTagihan } = await supabase.from('tagihan').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
     const { data: listTiket } = await supabase.from('tiket').select('*').eq('id_pelanggan', customer.customer_code).order('id', { ascending: false }).limit(1);
@@ -275,7 +318,8 @@ app.post('/api/auth/login-send-otp', async (req, res) => {
     // Cari pelanggan yang emailnya cocok
     const { data: allCustomers, error: errCust } = await supabase
       .from('customers')
-      .select('*');
+      .select('*')
+      .neq('customer_code', 'SYSTEM_SETTINGS');
 
     if (errCust) throw errCust;
 
@@ -311,7 +355,9 @@ app.post('/api/auth/login-send-otp', async (req, res) => {
 
     res.json({
       success: true,
-      message: `Kode OTP 6-digit telah dikirim ke ${cleanEmail}. Periksa inbox atau spam email Anda.`,
+      message: mailRes.simulated
+        ? `Mode Simulasi Aktif: Kode OTP Anda adalah [ ${otp} ]. (Atur akun Gmail di Admin Setting agar terkirim ke email sungguhan).`
+        : `Kode OTP 6-digit telah dikirim ke ${cleanEmail}. Periksa inbox atau spam email Anda.`,
       email: cleanEmail,
       simulated: mailRes.simulated || false,
       debugOtp: mailRes.simulated ? otp : undefined
@@ -335,7 +381,8 @@ app.post('/api/auth/login-verify-otp', async (req, res) => {
   try {
     const { data: allCustomers, error: errCust } = await supabase
       .from('customers')
-      .select('*');
+      .select('*')
+      .neq('customer_code', 'SYSTEM_SETTINGS');
 
     if (errCust) throw errCust;
 
@@ -402,7 +449,8 @@ app.get('/api/auth/me', async (req, res) => {
   try {
     const { data: allCustomers, error: errCust } = await supabase
       .from('customers')
-      .select('*');
+      .select('*')
+      .neq('customer_code', 'SYSTEM_SETTINGS');
 
     if (errCust) throw errCust;
 
@@ -471,6 +519,7 @@ app.get(['/api/pelanggan/:id', '/pelanggan/data/:id', '/api/customer/:id'], asyn
     const { data: listCustomers, error: errCust } = await supabase
       .from('customers')
       .select('*')
+      .neq('customer_code', 'SYSTEM_SETTINGS')
       .or(filterQuery)
       .limit(1);
 
@@ -545,16 +594,16 @@ app.put('/api/customers/:code', async (req, res) => {
 });
 
 // API Settings
-app.get('/api/settings', (req, res) => {
-  const settings = getSettings();
+app.get('/api/settings', async (req, res) => {
+  const settings = await getSettings();
   res.json({ success: true, data: settings });
 });
 
-app.post('/api/settings', (req, res) => {
+app.post('/api/settings', async (req, res) => {
   try {
-    const current = getSettings();
+    const current = await getSettings();
     const updated = { ...current, ...req.body };
-    saveSettings(updated);
+    await saveSettings(updated);
     res.json({ success: true, message: "Pengaturan berhasil disimpan!", data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -574,7 +623,7 @@ app.post('/api/test-email', async (req, res) => {
     res.json({
       success: true,
       message: result.simulated
-        ? `Mode Simulasi Aktif: Kode OTP ${testOtp} dicatat di server. (Isi SMTP User & Password di pengaturan jika ingin email sungguhan terkirim).`
+        ? `Mode Simulasi Aktif: Kode OTP [ ${testOtp} ] dicatat di server. (Isi Email & Sandi Aplikasi Gmail di form atas untuk mengirim email sungguhan).`
         : `Email uji coba berhasil dikirim ke ${targetEmail}!`,
       data: result
     });
@@ -584,16 +633,16 @@ app.post('/api/test-email', async (req, res) => {
 });
 
 // Legacy Payment Methods compatibility
-app.get('/api/payment-methods', (req, res) => {
-  const settings = getSettings();
+app.get('/api/payment-methods', async (req, res) => {
+  const settings = await getSettings();
   res.json({ success: true, data: settings.paymentMethods || [] });
 });
 
-app.post('/api/payment-methods', (req, res) => {
+app.post('/api/payment-methods', async (req, res) => {
   try {
-    const settings = getSettings();
+    const settings = await getSettings();
     settings.paymentMethods = req.body;
-    saveSettings(settings);
+    await saveSettings(settings);
     res.json({ success: true, message: "Metode pembayaran berhasil disimpan!", data: req.body });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
