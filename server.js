@@ -772,6 +772,16 @@ app.post(['/api/lapor', '/lapor'], async (req, res) => {
       await supabase.from('customers').update({ visit_checklist: v }).eq('customer_code', idPelanggan);
     }
 
+    res.json({
+      success: true,
+      message: "Laporan tersimpan",
+      tiket: { idTiket, idPelanggan, kendala, status: "Menunggu Teknisi" }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // ==========================================
 // 7. REAL SPEEDTEST API ENDPOINTS
 // ==========================================
